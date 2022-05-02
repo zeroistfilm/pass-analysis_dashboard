@@ -2,11 +2,12 @@
 
     import Chart from "./component/Chart.svelte";
     import NavBar from "./component/NavBar.svelte";
-    import {onMount, afterUpdate} from 'svelte';
+    import {onMount, afterUpdate, beforeUpdate} from 'svelte';
     import Menulist from "./component/Menulist.svelte";
-
+    import {itemDict} from "./store/store.js"
 
     let isHamburger;
+
 
 
 </script>
@@ -19,13 +20,28 @@
     <div class="subcontainer">
         {#if isHamburger}
             <div class="Menulist">
-                <Menulist />
+                <Menulist/>
             </div>
-
         {/if}
-        <div class="Chart">
-            <Chart />
-        </div>
+
+
+        {#if $itemDict['isOtherFunction'] }
+            <div class="otherFunction">
+                otherFunction
+            </div>
+        {/if}
+
+        {#if $itemDict['isOtherFunction2'] }
+            <div class="otherFunction">
+                otherFunction2
+            </div>
+        {/if}
+
+        {#if $itemDict['isActivity']}
+            <div class="Chart">
+                <Chart/>
+            </div>
+        {/if}
 
     </div>
 
@@ -45,12 +61,14 @@
 
     }
 
-    .navbar{
+    .navbar {
         background: rgb(113, 143, 208);
     }
+
     .Menulist {
         background: rgb(199, 222, 237);
         width: 220px;
+        height: 80vh;
         /*flex-basis: 10%;*/
     }
 
