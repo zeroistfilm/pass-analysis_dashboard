@@ -14,8 +14,8 @@ jobs:
           npm install
           npm run build
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: JamesIves/github-pages-deploy-action@4.3.3
         with:
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           branch: master
           folder: public
