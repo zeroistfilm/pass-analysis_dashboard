@@ -33,7 +33,7 @@
 
         {#if $itemDict['isOtherFunction2'] }
             <div class="otherFunction">
-                otherFunction2 - Test GitActions
+                otherFunction2 - Test GitActions 깃 액션 성공하나요~
             </div>
         {/if}
 
