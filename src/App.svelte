@@ -2,7 +2,7 @@
 
     import Chart from "./component/Chart.svelte";
     import NavBar from "./component/NavBar.svelte";
-    import {onMount, afterUpdate, beforeUpdate} from 'svelte';
+    // import {onMount, afterUpdate, beforeUpdate} from 'svelte';
     import Menulist from "./component/Menulist.svelte";
     import {itemDict} from "./store/store.js"
 
@@ -33,7 +33,7 @@
 
         {#if $itemDict['isOtherFunction2'] }
             <div class="otherFunction">
-                otherFunction2
+                otherFunction2 - Test GitActions
             </div>
         {/if}
 
