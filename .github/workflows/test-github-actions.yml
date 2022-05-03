@@ -1,30 +1,38 @@
-name: GitHub Actions Demo
-on: [ push ]
-jobs:
-  build:
-    strategy:
-      matrix:
-        node-version: [ 16.x ]
+name: Deploy
 
-    runs-on: ubuntu-latest
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+        with:
+          submodules: true
+
+      - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: "16.x"
 
-      - run: npm i
-      - run: npm run build
+      - name: Cache dependencies Node
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
 
+      - name: Install
+        run: npm i
 
+      - name: Build Svelte
+        run: npm run build
 
-
-#      - name: Cache yarn dependencies
-#        uses: actions/cache@v1
-#        id: yarn-cache
-#        with:
-#          path: node_modules
-#          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-#          restore-keys: |
-#            ${{ runner.os }}-yarn-
+      - name: Deploy
+        uses: zeroistfilm/svelte-chart@v3
+        with:
+          github_token: ${{ secrets.GHCR_TOKEN }}
+          publish_dir: ./public
