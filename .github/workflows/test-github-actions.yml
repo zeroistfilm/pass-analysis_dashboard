@@ -1,19 +1,19 @@
 name: Deploy
-
 on:
   push:
     branches:
       - master
-
 jobs:
   deploy:
     runs-on: ubuntu-18.04
     steps:
-      - name: Run pwd
-        run: pwd
-      - name: Run ls -al
-        run: ls -al
-      - name: context
-        env:
-          COMMIT_ID: ${{github.sha}}
-        run: echo "Commit id => $COMMIT_ID"
+      - uses: actions/checkout@v2
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build
+      - name: Deploy to GitHub Pages
+        uses: zeroistfilm/svelte-chart
+        with:
+          branch: master
+          folder: public
