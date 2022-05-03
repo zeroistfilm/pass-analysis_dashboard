@@ -9,23 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: "16.x"
-
-      - name: Install
-        run: npm i
-
-      - name: Build Svelte
-        run: npm run build
-
-      - name: Deploy
-        uses: zeroistfilm/svelte-chart
-        with:
-          github_token: ${{ secrets.GHCR_TOKEN }}
-          publish_dir: ./public
+      - name: Run pwd
+        run: pwd
+      - name: Run ls -al
+        run: ls -al
