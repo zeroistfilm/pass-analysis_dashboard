@@ -25,3 +25,21 @@ jobs:
         with:
           push: true
           tags: zeroistfilm/svelte-chart:latest
+
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: [ self-hosted, pass-analysis ]
+    steps:
+      - name: Login to ghcr
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Docker run
+        run: |
+          docker stop svelte-chart
+          docker rm svelte-chart
+          docker rmi zeroistfilm/svelte-chart:latest
+          docker run -d -p 8081:8081 --name svelte-chart --restart always zeroistfilm/svelte-chart:latest
