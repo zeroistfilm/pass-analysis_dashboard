@@ -3,6 +3,8 @@
     import DateSeletor from "./DateSeletor.svelte";
     import {onMount, afterUpdate} from 'svelte';
     import chartjs from 'chart.js';
+    import {activityList} from "../store/store";
+
 
     let ctx;
     let chartCanvas;
@@ -10,7 +12,7 @@
 
     let timestampKST = '2022-04-01';
     let dayrange = 1;
-    let dataSet;
+    let dataSet=makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'],      $activityList['returnValuesArray']);
 
     let isLogScale = true;
     let isloadding = false;
@@ -56,6 +58,12 @@
             tmpday = date;
         }
         console.log(dayLabelList)
+        $activityList['dayLabelList']=dayLabelList
+        $activityList['returnDaysArray']=returnDaysArray
+        $activityList['returnValuesArray']=returnValuesArray
+
+
+        console.log('getAct', $activityList)
         return [dayLabelList, returnDaysArray, returnValuesArray];
     }
 
@@ -128,7 +136,8 @@
         jsvalue = Object.values(js.total)
 
         let returned = daysSplit(Object.keys(js.total), Object.values(js.total))
-        dataSet = makeDataset(returned[0], returned[1], returned[2])
+
+        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'],      $activityList['returnValuesArray'])
         myChart.data = dataSet
         isloadding = false;
         myChart.update()
@@ -148,7 +157,7 @@
 
         const res = await fetch(`http://211.225.60.127:40178/api/datatocsv?timestampKST=${timestampKST.split('-').reduce((i, j) => (i + j))}&dayrange=${dayrange}`, {method: 'GET'})
         console.log(res)
-        if (!res.ok){
+        if (!res.ok) {
             isloadding = false;
             return;
         }
@@ -167,7 +176,8 @@
         jsvalue = Object.values(js.total)
 
         let returned = daysSplit(Object.keys(js.total), Object.values(js.total))
-        dataSet = makeDataset(returned[0], returned[1], returned[2])
+
+        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'],      $activityList['returnValuesArray'])
         myChart.data = dataSet
         isloadding = false;
         myChart.update()
@@ -290,7 +300,7 @@
     {/if}
     <button class="item" on:click={getActivtyWithManyDates}>getActivity</button>
     <div class="item">
-        <input  type=checkbox on:click={handleIsLogScale} bind:checked={isLogScale}>
+        <input type=checkbox on:click={handleIsLogScale} bind:checked={isLogScale}>
         LogScale
     </div>
     <div class="item">
