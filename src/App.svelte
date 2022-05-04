@@ -2,6 +2,7 @@
 
     import Chart from "./component/Chart.svelte";
     import NavBar from "./component/NavBar.svelte";
+    import Boxchart from "./component/Boxchart.svelte";
     // import {onMount, afterUpdate, beforeUpdate} from 'svelte';
     import Menulist from "./component/Menulist.svelte";
     import {itemDict} from "./store/store.js"
@@ -24,10 +25,15 @@
             </div>
         {/if}
 
+        {#if $itemDict['isActivity']}
+            <div class="Chart">
+                <Chart/>
+            </div>
+        {/if}
 
         {#if $itemDict['isOtherFunction'] }
             <div class="otherFunction">
-                otherFunction
+              <Boxchart/>
             </div>
         {/if}
 
@@ -37,11 +43,7 @@
             </div>
         {/if}
 
-        {#if $itemDict['isActivity']}
-            <div class="Chart">
-                <Chart/>
-            </div>
-        {/if}
+
 
     </div>
 
@@ -68,7 +70,7 @@
     .Menulist {
         background: rgb(199, 222, 237);
         width: 220px;
-        height: 80vh;
+        height: 300vh;
         /*flex-basis: 10%;*/
     }
 

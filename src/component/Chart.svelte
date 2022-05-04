@@ -147,6 +147,11 @@
         isloadding = true;
 
         const res = await fetch(`http://211.225.60.127:40178/api/datatocsv?timestampKST=${timestampKST.split('-').reduce((i, j) => (i + j))}&dayrange=${dayrange}`, {method: 'GET'})
+        console.log(res)
+        if (!res.ok){
+            isloadding = false;
+            return;
+        }
         const js = JSON.parse(await res.json())
 
 
