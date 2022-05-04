@@ -6,8 +6,11 @@ export let itemDict = writable({
     'isOtherFunction2': false,
 })
 
-export let activityList= writable({
-    'dayLabelList':[],
-    'returnDaysArray':[],
-    'returnValuesArray':[]
+export let activityList = writable({
+    'dayLabelList': [],
+    'returnDaysArray': [],
+    'returnValuesArray': []
 });
+
+
+export let isLogScale = writable(true)

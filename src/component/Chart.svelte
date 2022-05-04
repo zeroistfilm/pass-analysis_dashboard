@@ -3,7 +3,7 @@
     import DateSeletor from "./DateSeletor.svelte";
     import {onMount, afterUpdate} from 'svelte';
     import chartjs from 'chart.js';
-    import {activityList} from "../store/store";
+    import {activityList, isLogScale} from "../store/store";
 
 
     let ctx;
@@ -14,7 +14,7 @@
     let dayrange = 1;
     let dataSet=makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'],      $activityList['returnValuesArray']);
 
-    let isLogScale = true;
+
     let isloadding = false;
 
     let selectedDateArray;
@@ -185,7 +185,7 @@
 
 
     function handleIsLogScale() {
-        isLogScale = !isLogScale
+        isLogScale.set(!$isLogScale)
         myChart.options = {
             scales: {
                 xAxes: [{
@@ -206,7 +206,7 @@
                         max: 220000000,
                         min: 0,
                     },
-                    type: isLogScale ? 'logarithmic' : 'linear'
+                    type: $isLogScale ? 'logarithmic' : 'linear'
                 },
                     {
                         position: 'right',
@@ -216,7 +216,7 @@
                             max: 220000000,
                             min: 0,
                         },
-                        type: isLogScale ? 'logarithmic' : 'linear'
+                        type: $isLogScale ? 'logarithmic' : 'linear'
                     }
                 ]
             }
@@ -253,7 +253,7 @@
                             max: 220000000,
                             min: 0,
                         },
-                        type: isLogScale ? 'logarithmic' : 'linear'
+                        type: $isLogScale ? 'logarithmic' : 'linear'
                     },
                         {
                             position: 'right',
@@ -263,7 +263,7 @@
                                 max: 220000000,
                                 min: 0,
                             },
-                            type: isLogScale ? 'logarithmic' : 'linear'
+                            type: $isLogScale ? 'logarithmic' : 'linear'
                         }
                     ]
                 }
@@ -290,7 +290,14 @@
         <h2>활동량 분석</h2>
         <p>활동량 분석을 위한 페이지 입니다.</p>
     </div>
-
+    <div class="item">
+        <DateSeletor bind:selectedDateArray={selectedDateArray}/>
+    </div>
+    <button class="item" on:click={getActivtyWithManyDates}>getActivity</button>
+    <div class="item">
+        <input type=checkbox on:click={handleIsLogScale} bind:checked={$isLogScale}>
+        LogScale
+    </div>
     <canvas class="item canvas" bind:this={chartCanvas} id="myChart"></canvas>
     {#if isloadding}
         <div class="loader">
@@ -298,14 +305,9 @@
             <span>loading...</span>
         </div>
     {/if}
-    <button class="item" on:click={getActivtyWithManyDates}>getActivity</button>
-    <div class="item">
-        <input type=checkbox on:click={handleIsLogScale} bind:checked={isLogScale}>
-        LogScale
-    </div>
-    <div class="item">
-        <DateSeletor bind:selectedDateArray={selectedDateArray}/>
-    </div>
+
+
+
 
 </div>
 

@@ -28,12 +28,13 @@
         {#if $itemDict['isActivity']}
             <div class="Chart">
                 <Chart/>
+                <Boxchart/>
             </div>
         {/if}
 
         {#if $itemDict['isOtherFunction'] }
             <div class="otherFunction">
-              <Boxchart/>
+
             </div>
         {/if}
 
