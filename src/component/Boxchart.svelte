@@ -2,111 +2,47 @@
     import "@carbon/charts/styles.min.css";
     import "carbon-components/css/carbon-components.min.css";
     import {BarChartSimple, BoxplotChart} from "@carbon/charts-svelte";
+
+
+    import { onMount } from "svelte";
+
+
+
+
+    let chart;
+
+    function barMouseOver(e) {
+        console.log(e.detail);
+    }
+
+    onMount(() => {
+        return () => {
+            if (chart) chart.services.events.removeEventListener("bar-mouseover", barMouseOver);
+        };
+    });
+
+    $: if (chart) chart.services.events.addEventListener("bar-mouseover", barMouseOver)
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
+    }
+    let tmpdata=[];
+    for(let i=0; i<200;i++){
+        tmpdata.push(
+            {
+                "group": String(getRandomInt(1,50)),
+                "value": Number(getRandomInt(100,500))
+            }
+        )
+    }
+    tmpdata.sort()
+    console.log(tmpdata)
 </script>
 
 <BoxplotChart
-        data={[
-	{
-		"group": "Q1",
-		"key": "Monday",
-		"value": 65000
-	},
-	{
-		"group": "Q1",
-		"key": "Tuesday",
-		"value": 29123
-	},
-	{
-		"group": "Q1",
-		"key": "Wednesday",
-		"value": 35213
-	},
-	{
-		"group": "Q1",
-		"key": "Thursday",
-		"value": 51213
-	},
-	{
-		"group": "Q1",
-		"key": "Friday",
-		"value": 16932
-	},
-	{
-		"group": "Q2",
-		"key": "Monday",
-		"value": 32432
-	},
-	{
-		"group": "Q2",
-		"key": "Tuesday",
-		"value": 14312
-	},
-	{
-		"group": "Q2",
-		"key": "Wednesday",
-		"value": 66456
-	},
-	{
-		"group": "Q2",
-		"key": "Thursday",
-		"value": 21312
-	},
-	{
-		"group": "Q2",
-		"key": "Friday",
-		"value": 37234
-	},
-	{
-		"group": "Q3",
-		"key": "Monday",
-		"value": 5312
-	},
-	{
-		"group": "Q3",
-		"key": "Tuesday",
-		"value": 23232
-	},
-	{
-		"group": "Q3",
-		"key": "Wednesday",
-		"value": 34232
-	},
-	{
-		"group": "Q3",
-		"key": "Thursday",
-		"value": 12312
-	},
-	{
-		"group": "Q3",
-		"key": "Friday",
-		"value": 44234
-	},
-	{
-		"group": "Q4",
-		"key": "Monday",
-		"value": 32423
-	},
-	{
-		"group": "Q4",
-		"key": "Tuesday",
-		"value": 21313
-	},
-	{
-		"group": "Q4",
-		"key": "Wednesday",
-		"value": 64353
-	},
-	{
-		"group": "Q4",
-		"key": "Thursday",
-		"value": 24134
-	},
-	{
-		"group": "Q4",
-		"key": "Friday",
-		"value": 45134
-	}
-]}
+        data={tmpdata}
         options={{
 	"title": "Vertical box plot",
 	"axes": {
@@ -134,6 +70,25 @@
     title: "Simple bar (discrete)",
     height: "400px",
     width:"800px",
+    axes: {
+      left: { mapsTo: "value" },
+      bottom: { mapsTo: "group", scaleType: "labels" },
+    },
+  }}
+/>
+
+<BarChartSimple
+        bind:chart
+        data={[
+    { group: "Qty", value: 650300 },
+    { group: "More", value: 291123 },
+    { group: "Sold", value: 34213 },
+    { group: "Restocking", value: 512313 },
+    { group: "Misc", value: 162932 },
+  ]}
+        options={{
+    title: "Simple bar (discrete)",
+    height: "400px",
     axes: {
       left: { mapsTo: "value" },
       bottom: { mapsTo: "group", scaleType: "labels" },
