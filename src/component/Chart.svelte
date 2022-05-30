@@ -18,6 +18,7 @@
     let isloadding = false;
 
     let selectedDateArray;
+    let farm;
 
     Date.prototype.addDays = function (days) {
         var date = new Date(this.valueOf());
@@ -115,9 +116,9 @@
         }
         isloadding = true;
 
-        const res = await fetch(`http://211.225.60.127:40178/api/activitywithdate`, {
+        const res = await fetch(`http://3.36.87.16:8000/api/activitywithdate`, {
             method: 'POST',
-            body: JSON.stringify({dates: selectedDateArray}),
+            body: JSON.stringify({dates: selectedDateArray, farm:farm}),
             headers: {'Content-Type': 'application/json'}
         })
 
@@ -155,7 +156,7 @@
         }
         isloadding = true;
 
-        const res = await fetch(`http://211.225.60.127:40178/api/datatocsv?timestampKST=${timestampKST.split('-').reduce((i, j) => (i + j))}&dayrange=${dayrange}`, {method: 'GET'})
+        const res = await fetch(`http://3.36.87.16:8000/api/datatocsv?timestampKST=${timestampKST.split('-').reduce((i, j) => (i + j))}&dayrange=${dayrange}`, {method: 'GET'})
         console.log(res)
         if (!res.ok) {
             isloadding = false;
@@ -177,7 +178,7 @@
 
         let returned = daysSplit(Object.keys(js.total), Object.values(js.total))
 
-        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'],      $activityList['returnValuesArray'])
+        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray'])
         myChart.data = dataSet
         isloadding = false;
         myChart.update()
@@ -250,7 +251,7 @@
                         ticks: {
                             beginAtZero: true,
                             stepValue: 5,
-                            max: 220000000,
+                            max: 2200000000,
                             min: 0,
                         },
                         type: $isLogScale ? 'logarithmic' : 'linear'
@@ -260,7 +261,7 @@
                             ticks: {
                                 beginAtZero: true,
                                 stepValue: 5,
-                                max: 220000000,
+                                max: 2200000000,
                                 min: 0,
                             },
                             type: $isLogScale ? 'logarithmic' : 'linear'
@@ -282,6 +283,7 @@
     });
 
 
+
 </script>
 
 <div class="container">
@@ -291,6 +293,11 @@
         <p>활동량 분석을 위한 페이지 입니다.</p>
     </div>
     <div class="item">
+        <select bind:value={farm}>
+            <option value="dongilps">동일피에스</option>
+            <option value="deulpul">들풀농장</option>
+
+        </select>
         <DateSeletor bind:selectedDateArray={selectedDateArray}/>
     </div>
     <button class="item" on:click={getActivtyWithManyDates}>getActivity</button>

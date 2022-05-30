@@ -41,6 +41,37 @@
                 "left": {
                     "mapsTo": "value",
                     "scaleType": $isLogScale ? 'log' : 'linear',
+                    "thresholds": [
+                        {
+                            "value": 10000000,
+                            "fillColor": "#74969d"
+                        },
+
+                        {
+                            "value": 30000000,
+                            "fillColor": "#74969d"
+                        },
+
+                        {
+                            "value": 50000000,
+                            "fillColor": "#74969d"
+                        },
+
+                        {
+                            "value": 70000000,
+                            "fillColor": "#74969d"
+                        },
+
+                        {
+                            "value": 90000000,
+                            "fillColor": "#74969d"
+                        },
+
+                        {
+                            "value": 110000000,
+                            "fillColor": "#74969d"
+                        },
+                    ]
                 },
                 "bottom": {
                     "scaleType": "labels",
