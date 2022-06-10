@@ -12,7 +12,7 @@
 
     let timestampKST = '2022-04-01';
     let dayrange = 1;
-    let dataSet=makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray']);
+    let dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray']);
 
 
     let isloadding = false;
@@ -26,6 +26,14 @@
         return date;
     }
 
+    function getDateDiff(d1, d2) {
+        const date1 = new Date(d1);
+        const date2 = new Date(d2);
+
+        const diffDate = date1.getTime() - date2.getTime();
+
+        return parseInt(Math.abs(diffDate / (1000 * 3600 * 24)));
+    }
 
     function daysSplit(days, values) {
         let tmpday = new Date(Number(days[0]));
@@ -35,37 +43,36 @@
         let returnDaysArray = [];
         let returnValuesArray = [];
         let dayLabelList = [];
-
-
+        let diff =0;
         for (let i = 0; i <= days.length; i++) {
             let date = new Date(Number(days[i]));
 
-            if (tmpday.getUTCDate() === date.getUTCDate()) {
 
-                if (date.getUTCDate() <  standardDay.getUTCDate()){
-                    tmpDayList = [...tmpDayList, date.addDays(-(new Date(date.getFullYear(), date.getMonth(),0).getDate()+date.getUTCDate() - standardDay.getUTCDate()))]
-                }else{
-                    tmpDayList = [...tmpDayList, date.addDays(-(date.getUTCDate() - standardDay.getUTCDate()))]
-                }
+            if (diff === getDateDiff(date, standardDay)) {
+                tmpDayList = [...tmpDayList, date.addDays(-getDateDiff(date, standardDay))]
                 tmpValList = [...tmpValList, values[i]]
 
             } else {
-                returnDaysArray.push(tmpDayList)
-                returnValuesArray.push(tmpValList)
-                tmpDayList = []
-                tmpValList = []
-                dayLabelList.push(tmpday.getUTCFullYear().toString() + "/" +
-                    (tmpday.getUTCMonth() + 1).toString() + "/" +
-                    tmpday.getUTCDate().toString())
+                if (tmpDayList.length!==0){
+                    returnDaysArray.push(tmpDayList)
+                    returnValuesArray.push(tmpValList)
+                    tmpDayList = []
+                    tmpValList = []
+                    dayLabelList.push(tmpday.getUTCFullYear().toString() + "/" +
+                        (tmpday.getUTCMonth() + 1).toString() + "/" +
+                        tmpday.getUTCDate().toString())
+                }
+
 
             }
+            diff = getDateDiff(date, standardDay)
+            tmpday =  date
 
-            tmpday = date;
         }
         console.log(dayLabelList)
-        $activityList['dayLabelList']=dayLabelList
-        $activityList['returnDaysArray']=returnDaysArray
-        $activityList['returnValuesArray']=returnValuesArray
+        $activityList['dayLabelList'] = dayLabelList
+        $activityList['returnDaysArray'] = returnDaysArray
+        $activityList['returnValuesArray'] = returnValuesArray
 
 
         console.log('getAct', $activityList)
@@ -122,7 +129,7 @@
 
         const res = await fetch(`http://3.36.87.16:8000/api/activitywithdate`, {
             method: 'POST',
-            body: JSON.stringify({dates: selectedDateArray, farm:farm}),
+            body: JSON.stringify({dates: selectedDateArray, farm: farm}),
             headers: {'Content-Type': 'application/json'}
         })
 
@@ -142,7 +149,7 @@
 
         let returned = daysSplit(Object.keys(js.total), Object.values(js.total))
 
-        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'],      $activityList['returnValuesArray'])
+        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray'])
         myChart.data = dataSet
         isloadding = false;
         myChart.update()
@@ -287,7 +294,6 @@
     });
 
 
-
 </script>
 
 <div class="container">
@@ -316,8 +322,6 @@
             <span>loading...</span>
         </div>
     {/if}
-
-
 
 
 </div>
