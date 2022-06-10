@@ -12,7 +12,7 @@
 
     let timestampKST = '2022-04-01';
     let dayrange = 1;
-    let dataSet=makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'],      $activityList['returnValuesArray']);
+    let dataSet=makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray']);
 
 
     let isloadding = false;
@@ -41,11 +41,15 @@
             let date = new Date(Number(days[i]));
 
             if (tmpday.getUTCDate() === date.getUTCDate()) {
-                tmpDayList = [...tmpDayList, date.addDays(-(date.getUTCDate() - standardDay.getUTCDate()))]
+
+                if (date.getUTCDate() <  standardDay.getUTCDate()){
+                    tmpDayList = [...tmpDayList, date.addDays(-(new Date(date.getFullYear(), date.getMonth(),0).getDate()+date.getUTCDate() - standardDay.getUTCDate()))]
+                }else{
+                    tmpDayList = [...tmpDayList, date.addDays(-(date.getUTCDate() - standardDay.getUTCDate()))]
+                }
                 tmpValList = [...tmpValList, values[i]]
 
             } else {
-                console.log('newday')
                 returnDaysArray.push(tmpDayList)
                 returnValuesArray.push(tmpValList)
                 tmpDayList = []
@@ -204,7 +208,7 @@
                     ticks: {
                         beginAtZero: true,
                         stepValue: 5,
-                        max: 220000000,
+                        max: 2200000000,
                         min: 0,
                     },
                     type: $isLogScale ? 'logarithmic' : 'linear'
@@ -214,7 +218,7 @@
                         ticks: {
                             beginAtZero: true,
                             stepValue: 5,
-                            max: 220000000,
+                            max: 2200000000,
                             min: 0,
                         },
                         type: $isLogScale ? 'logarithmic' : 'linear'
