@@ -3,6 +3,7 @@
 </script>
 
 <div class="cards">
+    테스트중입니다.
     <div class="cardItem" id="sale">
         <p class="itemTitle">현재 활동량</p>
         <p class="itemValue">684</p>
