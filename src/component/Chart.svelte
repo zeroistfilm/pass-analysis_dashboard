@@ -127,7 +127,7 @@
         }
         isloadding = true;
 
-        const res = await fetch(`http://3.34.96.184:8000/api/activitywithdate`, {
+        const res = await fetch(`http://3.36.242.203:8000/api/activitywithdate`, {
             method: 'POST',
             body: JSON.stringify({dates: selectedDateArray, farm: farm}),
             headers: {'Content-Type': 'application/json'}
@@ -167,7 +167,7 @@
         }
         isloadding = true;
 
-        const res = await fetch(`http://3.34.96.184:8000/api/datatocsv?timestampKST=${timestampKST.split('-').reduce((i, j) => (i + j))}&dayrange=${dayrange}`, {method: 'GET'})
+        const res = await fetch(`http://3.36.242.203:8000/api/datatocsv?timestampKST=${timestampKST.split('-').reduce((i, j) => (i + j))}&dayrange=${dayrange}`, {method: 'GET'})
         console.log(res)
         if (!res.ok) {
             isloadding = false;
