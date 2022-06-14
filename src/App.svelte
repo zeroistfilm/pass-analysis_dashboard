@@ -20,25 +20,25 @@
         <NavBar bind:isHamburger={isHamburger}/>
     </div>
 
-    <div class="subcontainer">
-        {#if isHamburger}
-            <div class="Menulist">
-                <Menulist/>
+
+    <Menulist/>
+
+
+    <div class="contents">
+        {#if $itemDict['TotalInfo'] }
+            <div class="TotalInfo">
+                <Totalinfo/>
             </div>
         {/if}
 
-        {#if $itemDict['isActivity']}
-            <div class="Chart">
+        {#if $itemDict['DatesInfo']}
+            <div class="InfoDates">
                 <Chart/>
                 <Boxchart/>
             </div>
         {/if}
 
-        {#if $itemDict['isOtherFunction'] }
-            <div class="otherFunction">
-                <Totalinfo/>
-            </div>
-        {/if}
+
 
         {#if $itemDict['isOtherFunction2'] }
             <div class="otherFunction">
@@ -58,28 +58,22 @@
         flex-direction: column;
     }
 
-    .subcontainer {
+    .contents {
         display: flex;
         flex-direction: row;
-        justify-content: flex-start;
-        width: 100vw;
+        align-items: flex-start;
+        padding: 30px 42px 98px 20px;
+        gap: 10px;
 
-    }
+        position: absolute;
+        width: 1300px;
+        height: 1160px;
+        left: 254px;
+        top: 72px;
 
-    .navbar {
-        background: rgb(113, 143, 208);
-    }
-
-    .Menulist {
-        background: rgb(199, 222, 237);
-        width: 220px;
-        height: 300vh;
-        /*flex-basis: 10%;*/
+        background: #FFFFFF;
     }
 
 
-    .Chart {
-        width: 85vw;
-        /*flex-basis: 80%;*/
-    }
+
 </style>
