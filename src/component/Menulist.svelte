@@ -50,7 +50,7 @@
         display: flex;
         flex-direction: row;
         align-items: flex-start;
-        padding: 30px 42px 98px 20px;
+        padding: 30px;
         gap: 10px;
 
         position: absolute;
@@ -96,15 +96,15 @@
         align-items: flex-start;
         padding: 8px 15px;
         gap: 10px;
-
+        margin: 5px;
         width: 188px;
         height: 40px;
 
         /* Primary color */
 
-        background: #eeebff;
+        background: rgba(252, 252, 252, 0.99);
         border-radius: 12px;
-
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
         /* Inside auto layout */
 
         flex: none;

@@ -38,7 +38,7 @@
 
 
 <div class="container">
-    <div class="item selector">
+    <div class="selector">
         <DateInput bind:value={date}
                    on:click={()=>{console.log('click')}}
                    format="yyyy/MM/dd"
@@ -46,8 +46,8 @@
                    visible="true"
                    {locale}/>
     </div>
-    <div class="item dayList">
-        <h3>선택한 날짜</h3>
+    <div class="dayList">
+        <h4>선택한 날짜</h4>
         <ul>
             {#each selectedDateArray as elem}
                 <li on:click={()=>deleteDateFromArray(elem)}>{elem}</li>
@@ -61,13 +61,8 @@
     .container{
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        align-items: flex-start;
         width: 100%;
-    }
-
-    .item{
-        padding: 1em;
-        margin: auto;
     }
 
     .selector{
@@ -76,13 +71,24 @@
         float:left
     }
     .dayList{
-        width: 50%;
-        float: left;
+        /* itemInner2 */
+
+
+        /* Auto layout */
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        /* Inside auto layout */
+
+        flex: none;
+        order: 1;
+        flex-grow: 0;
     }
     li {
-        padding: 5px 0px 5px 5px;
-        margin-bottom: 5px;
-        border-bottom: 1px solid #efefef;
-        font-size: 12px;
+        flex: none;
+        order: 1;
+        flex-grow: 0;
     }
 </style>

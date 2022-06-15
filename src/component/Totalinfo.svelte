@@ -1025,6 +1025,7 @@ import {LineChart} from "@carbon/charts-svelte";
         padding: 24px 22px;
         background: #FCFCFC;
         border-radius: 15px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
     .board {
         width: 560px;
@@ -1034,6 +1035,7 @@ import {LineChart} from "@carbon/charts-svelte";
         padding: 24px 22px;
         background: #FCFCFC;
         border-radius: 15px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
     .smallBoard{
         width: 277px;
@@ -1044,6 +1046,7 @@ import {LineChart} from "@carbon/charts-svelte";
         padding: 24px 22px;
         background: #FCFCFC;
         border-radius: 15px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
 
     .cards {
@@ -1087,6 +1090,7 @@ import {LineChart} from "@carbon/charts-svelte";
         flex: none;
         order: 0;
         flex-grow: 1;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 
     }
 

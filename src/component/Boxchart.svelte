@@ -78,8 +78,8 @@
                     "mapsTo": "group"
                 }
             },
-            "height": "400px",
-            width: "800px",
+            "height": "370px",
+            // width: "800px",
         }
 
         lineChartOptions = {
@@ -104,7 +104,7 @@
                     "enabled": true
                 }
             },
-            "height": "400px"
+            // "height": "400px"
         }
 
     }
@@ -144,18 +144,25 @@
 
 </script>
 
-<LineChart
-        data={{	"labels": ["activity"],
-            datasets:dailyplot
-        }
+<!--<LineChart-->
+<!--        data={-->
+<!--        {	"labels": ["activity"],-->
+<!--            datasets:dailyplot-->
+<!--        }-->
 
-        }
-        options={lineChartOptions}
-/>
+<!--        }-->
+<!--        options={lineChartOptions}-->
+<!--/>-->
 
 
 <BoxplotChart
+        class="boxplot"
         data={boxplotdata}
         options={boxChartOptions}
 />
 
+<style>
+    .boxplot{
+        height: 500px;
+    }
+</style>

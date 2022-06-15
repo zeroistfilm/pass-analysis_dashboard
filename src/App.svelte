@@ -1,6 +1,6 @@
 <script>
 
-    import Chart from "./component/Chart.svelte";
+    import DatesInfo from "./component/DatesInfo.svelte";
     import NavBar from "./component/NavBar.svelte";
     import Boxchart from "./component/Boxchart.svelte";
     // import {onMount, afterUpdate, beforeUpdate} from 'svelte';
@@ -33,8 +33,8 @@
 
         {#if $itemDict['DatesInfo']}
             <div class="InfoDates">
-                <Chart/>
-                <Boxchart/>
+                <DatesInfo/>
+
             </div>
         {/if}
 
@@ -73,7 +73,5 @@
 
         background: #FFFFFF;
     }
-
-
 
 </style>

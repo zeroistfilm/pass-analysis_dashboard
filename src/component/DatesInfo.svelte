@@ -4,6 +4,7 @@
     import {onMount, afterUpdate} from 'svelte';
     import chartjs from 'chart.js';
     import {activityList, isLogScale} from "../store/store";
+    import Boxchart from "./Boxchart.svelte";
 
 
     let ctx;
@@ -30,30 +31,29 @@
         const date1 = new Date(d1);
         const date2 = new Date(d2);
 
-        const diffDate = date1.getTime() - date2.getTime();
+        const diffDate = date1.getUTCDate() - date2.getUTCDate();
 
-        return parseInt(Math.abs(diffDate / (1000 * 3600 * 24)));
+        return parseInt(Math.abs(diffDate));
     }
 
-    function daysSplit(days, values) {
-        let tmpday = new Date(Number(days[0]));
-        let standardDay = new Date(Number(days[0]));
+    function daysSplit(times, values) {
+        let tmpday = new Date(Number(times[0]));
+        let standardDay = new Date(Number(times[0]));
         let tmpDayList = [];
         let tmpValList = [];
         let returnDaysArray = [];
         let returnValuesArray = [];
         let dayLabelList = [];
-        let diff =0;
-        for (let i = 0; i <= days.length; i++) {
-            let date = new Date(Number(days[i]));
-
+        let diff = 0;
+        for (let i = 0; i <= times.length; i++) {
+            let date = new Date(Number(times[i]));
 
             if (diff === getDateDiff(date, standardDay)) {
                 tmpDayList = [...tmpDayList, date.addDays(-getDateDiff(date, standardDay))]
                 tmpValList = [...tmpValList, values[i]]
 
             } else {
-                if (tmpDayList.length!==0){
+                if (tmpDayList.length !== 0) {
                     returnDaysArray.push(tmpDayList)
                     returnValuesArray.push(tmpValList)
                     tmpDayList = []
@@ -66,7 +66,8 @@
 
             }
             diff = getDateDiff(date, standardDay)
-            tmpday =  date
+
+            tmpday = date
 
         }
         console.log(dayLabelList)
@@ -296,68 +297,170 @@
 
 </script>
 
-<div class="container">
+<div class="">
+    <div class="container">
+        {#if isloadding}
+            <div class="loader">
+                <BarLoader size="70" color="#FF3E00" unit="px" duration="1s"></BarLoader>
+                <span>loading...</span>
+            </div>
+        {/if}
+        <div class="item">
+            <div class="itemInner">
+                <!--calender-->
+                <select bind:value={farm}>
+                    <option value="dongilps">동일피에스</option>
+                    <option value="deulpul">들풀농장</option>
+                </select>
+                <DateSeletor bind:selectedDateArray={selectedDateArray}/>
+                <button on:click={getActivtyWithManyDates}>데이터 불러오기</button>
 
-    <div class="item">
-        <h2>활동량 분석</h2>
-        <p>활동량 분석을 위한 페이지 입니다.</p>
-    </div>
-    <div class="item">
-        <select bind:value={farm}>
-            <option value="dongilps">동일피에스</option>
-            <option value="deulpul">들풀농장</option>
+            </div>
 
-        </select>
-        <DateSeletor bind:selectedDateArray={selectedDateArray}/>
-    </div>
-    <button class="item" on:click={getActivtyWithManyDates}>getActivity</button>
-    <div class="item">
-        <input type=checkbox on:click={handleIsLogScale} bind:checked={$isLogScale}>
-        LogScale
-    </div>
-    <canvas class="item canvas" bind:this={chartCanvas} id="myChart"></canvas>
-    {#if isloadding}
-        <div class="loader">
-            <BarLoader size="70" color="#FF3E00" unit="px" duration="1s"></BarLoader>
-            <span>loading...</span>
+            <div class="itemInner">
+                <!--boxp-lot-->
+                <Boxchart/>
+            </div>
         </div>
-    {/if}
 
-
+        <div class="item">
+            <div class="itemInnerNoWidth">
+                <input type=checkbox on:click={handleIsLogScale} bind:checked={$isLogScale}>
+                <span>LogScale</span>
+                <!--activity-plot-->
+                <canvas class="canvas" bind:this={chartCanvas} id="myChart"></canvas>
+            </div>
+        </div>
+        <div class="item">
+            <!--Image-->
+        </div>
+    </div>
 </div>
 
 
 <style>
+    .canvas{
+        width: 1100px;
+    }
+    .frame {
+        /* Frame-col */
+
+
+        /* Auto layout */
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 30px 42px 98px 20px;
+        gap: 10px;
+
+        position: absolute;
+        width: 1186px;
+
+        left: 254px;
+        top: 73px;
+
+
+    }
 
     .container {
+        /* container-col */
+
+
+        /* Auto layout */
+
         display: flex;
-        position: relative;
-        width: 90%;
         flex-direction: column;
-        padding: 1em 2em 1em 1em;
+        align-items: center;
+        padding: 0px;
+
+        width: 1183px;
+
+
+        /* Inside auto layout */
+
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+
 
     }
 
     .item {
+        /* item-row */
 
-        padding: 1em;
-        margin: auto;
+
+        /* Auto layout */
+
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 10px;
+        gap: 10px;
+
+        width: 1144px;
+
+
+        /* Inside auto layout */
+
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+
+
+        background: rgba(252, 252, 252, 0.99);
+        border-radius: 15px;
     }
 
-    .canvas {
-        width: 100%;
+    .itemInnerNoWidth {
+        /* itemInner */
+
+
+        /* Auto layout */
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+
+
+
+
+        /* Inside auto layout */
+
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+
+        background: #fafafb;
+        border-radius: 15px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
 
-    .loader {
-        position: absolute;
-        left: 50%;
-        top: 30%;
-        z-index: 1;
-        width: 150px;
-        height: 150px;
-        margin: auto;
-        -webkit-animation: spin 2s linear infinite;
-        animation: spin 2s linear infinite;
+    .itemInner {
+        /* itemInner */
+
+
+        /* Auto layout */
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+
+        width: 550px;
+
+
+        /* Inside auto layout */
+
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+
+        background: #fafafb;
+        border-radius: 15px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
+
 
 </style>
