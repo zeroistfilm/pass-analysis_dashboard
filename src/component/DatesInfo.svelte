@@ -59,7 +59,7 @@
 
 
             if (diff === getDateDiff(date, standardDay)) {
-                tmpDayList = [...tmpDayList, date.addDays(-getDateDiff(date, standardDay))]
+                tmpDayList = [...tmpDayList, date.addDays(-getTimeDiff(date, standardDay))]
                 tmpValList = [...tmpValList, values[i]]
 
             } else {
