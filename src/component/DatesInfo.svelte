@@ -27,6 +27,14 @@
         return date;
     }
 
+    function getTimeDiff(d1, d2) {
+        const date1 = new Date(d1);
+        const date2 = new Date(d2);
+
+        const diffDate = date1.getTime() - date2.getTime();
+
+        return parseInt(Math.abs(diffDate / (1000 * 3600 * 24)));
+    }
     function getDateDiff(d1, d2) {
         const date1 = new Date(d1);
         const date2 = new Date(d2);
@@ -47,13 +55,15 @@
         let diff = 0;
         for (let i = 0; i <= times.length; i++) {
             let date = new Date(Number(times[i]));
+            console.log(diff, date)
+
 
             if (diff === getDateDiff(date, standardDay)) {
                 tmpDayList = [...tmpDayList, date.addDays(-getDateDiff(date, standardDay))]
                 tmpValList = [...tmpValList, values[i]]
 
             } else {
-                if (tmpDayList.length !== 0) {
+                if (tmpDayList.length!==0){
                     returnDaysArray.push(tmpDayList)
                     returnValuesArray.push(tmpValList)
                     tmpDayList = []
@@ -66,8 +76,7 @@
 
             }
             diff = getDateDiff(date, standardDay)
-
-            tmpday = date
+            tmpday =  date
 
         }
         console.log(dayLabelList)
