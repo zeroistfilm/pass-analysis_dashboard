@@ -42,4 +42,4 @@ jobs:
           docker stop svelte-chart
           docker rm svelte-chart
           docker rmi zeroistfilm/svelte-chart:latest
-          docker run -d -p 8081:8081 --name svelte-chart --restart always zeroistfilm/svelte-chart:latest
+          docker run -d -p 8081:8081 --name svelte-chart zeroistfilm/svelte-chart:latest
