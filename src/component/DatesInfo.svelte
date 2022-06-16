@@ -1,19 +1,15 @@
 <script>
     import {BarLoader} from 'svelte-loading-spinners'
     import DateSeletor from "./DateSeletor.svelte";
-    import {onMount, afterUpdate} from 'svelte';
-    import chartjs from 'chart.js';
+
     import {activityList, isLogScale} from "../store/store";
     import Boxchart from "./Boxchart.svelte";
+    import Linechart_chartjs from "./Linechart_chartjs.svelte";
+    import Linechart_carbon from "./Linechart_carbon.svelte";
 
-
-    let ctx;
-    let chartCanvas;
-    let myChart;
 
     let timestampKST = '2022-04-01';
     let dayrange = 1;
-    let dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray']);
 
 
     let isloadding = false;
@@ -21,6 +17,7 @@
     let selectedDateArray;
     let farm;
 
+    let Linechart;
     Date.prototype.addDays = function (days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -45,18 +42,19 @@
     }
 
     function daysSplit(times, values) {
+
         let tmpday = new Date(Number(times[0]));
-        let standardDay = new Date(Number(times[0]));
+        let standardDay =new Date(tmpday.getUTCFullYear(), tmpday.getUTCMonth(), tmpday.getUTCDate(), 9)
+        console.log(tmpday, standardDay)
+        //let standardDay = new Date(Number(times[0]));
         let tmpDayList = [];
         let tmpValList = [];
         let returnDaysArray = [];
         let returnValuesArray = [];
         let dayLabelList = [];
         let diff = 0;
-        for (let i = 0; i <= times.length; i++) {
-            let date = new Date(Number(times[i]));
-            console.log(diff, date)
-
+        for (let i = 0; i <= times.length-1; i++) {
+            let date = new Date(Number(times[i+1]));
 
             if (diff === getDateDiff(date, standardDay)) {
                 tmpDayList = [...tmpDayList, date.addDays(-getTimeDiff(date, standardDay))]
@@ -89,46 +87,9 @@
         return [dayLabelList, returnDaysArray, returnValuesArray];
     }
 
-    function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
-    }
-
-    function makeDataset(labels, dates, values) {
-        let returndatas = [];
-        let label;
-        let data = [];
-        console.log(dates.length, values.length)
-        for (let i = 0; i < dates.length; i++) {
-
-            label = labels[i]
-            for (let j = 0; j < dates[i].length; j++) {
-                data = [...data, {
-                    x: new Date(dates[i][j].getTime() + dates[i][j].getTimezoneOffset() * 60 * 1000),
-                    y: values[i][j],
-                }]
-            }
-            returndatas = [...returndatas,
-                {
-                    pointStyle: 'dash',
-                    borderColor: `rgba(${getRandomInt(0, 255)},${getRandomInt(0, 255)},${getRandomInt(0, 255)},0.71)`,
-                    fill: false,
-                    label: label,
-                    data: data
-                }]
-            data = []
-
-        }
-
-        return {datasets: returndatas}
-    }
-
 
     async function getActivtyWithManyDates() {
         console.log(selectedDateArray)
-        let jskeys;
-        let jsvalue;
 
         if (!timestampKST.trim()) {
             timestampKST = ''
@@ -144,164 +105,22 @@
         })
 
         const js = JSON.parse(await res.json())
-        console.log(js.total.length)
 
-        jskeys = Object.keys(js.total).map((elem) => {
-            let date = new Date(Number(elem));
-            return date.getUTCFullYear().toString() + "-"
-                + (("00" + (date.getUTCMonth() + 1).toString()).slice(-2)) + "-"
-                + (("00" + date.getUTCDate().toString()).slice(-2)) + " "
-                + (("00" + date.getUTCHours().toString()).slice(-2)) + ":"
-                + (("00" + date.getUTCMinutes().toString()).slice(-2));
-        })
+        daysSplit(Object.keys(js.total), Object.values(js.total))
+        Linechart.dataupdate();
 
-        jsvalue = Object.values(js.total)
 
-        let returned = daysSplit(Object.keys(js.total), Object.values(js.total))
-
-        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray'])
-        myChart.data = dataSet
         isloadding = false;
-        myChart.update()
-    }
 
-    async function getActivty() {
-        console.log(selectedDateArray)
-        let jskeys;
-        let jsvalue;
-
-        if (!timestampKST.trim()) {
-            timestampKST = ''
-            dayrange = ''
-            return;
-        }
-        isloadding = true;
-
-        const res = await fetch(`http://3.36.242.203:8000/api/datatocsv?timestampKST=${timestampKST.split('-').reduce((i, j) => (i + j))}&dayrange=${dayrange}`, {method: 'GET'})
-        console.log(res)
-        if (!res.ok) {
-            isloadding = false;
-            return;
-        }
-        const js = JSON.parse(await res.json())
-
-
-        jskeys = Object.keys(js.total).map((elem) => {
-            let date = new Date(Number(elem));
-            return date.getUTCFullYear().toString() + "-"
-                + (("00" + (date.getUTCMonth() + 1).toString()).slice(-2)) + "-"
-                + (("00" + date.getUTCDate().toString()).slice(-2)) + " "
-                + (("00" + date.getUTCHours().toString()).slice(-2)) + ":"
-                + (("00" + date.getUTCMinutes().toString()).slice(-2));
-        })
-
-        jsvalue = Object.values(js.total)
-
-        let returned = daysSplit(Object.keys(js.total), Object.values(js.total))
-
-        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray'])
-        myChart.data = dataSet
-        isloadding = false;
-        myChart.update()
     }
 
 
     function handleIsLogScale() {
         isLogScale.set(!$isLogScale)
-        myChart.options = {
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        displayFormats: {
-                            quarter: 'MMM YYYY'
-                        }
-                    }
-                },
-
-                ],
-                yAxes: [{
-                    position: 'left',
-                    ticks: {
-                        beginAtZero: true,
-                        stepValue: 5,
-                        max: 2200000000,
-                        min: 0,
-                    },
-                    type: $isLogScale ? 'logarithmic' : 'linear'
-                },
-                    {
-                        position: 'right',
-                        ticks: {
-                            beginAtZero: true,
-                            stepValue: 5,
-                            max: 2200000000,
-                            min: 0,
-                        },
-                        type: $isLogScale ? 'logarithmic' : 'linear'
-                    }
-                ]
-            }
-        }
-
-        myChart.update()
+        Linechart.dataupdate();
     }
 
 
-    function createChart(data) {
-        ctx = chartCanvas.getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: data,
-            pan: {enabled: true, mode: 'xy'},
-            zoom: {enabled: true, mode: 'xy',},
-            options: {
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        time: {
-                            displayFormats: {
-                                quarter: 'MMM YYYY'
-                            }
-                        }
-                    },
-
-                    ],
-                    yAxes: [{
-                        position: 'left',
-                        ticks: {
-                            beginAtZero: true,
-                            stepValue: 5,
-                            max: 2200000000,
-                            min: 0,
-                        },
-                        type: $isLogScale ? 'logarithmic' : 'linear'
-                    },
-                        {
-                            position: 'right',
-                            ticks: {
-                                beginAtZero: true,
-                                stepValue: 5,
-                                max: 2200000000,
-                                min: 0,
-                            },
-                            type: $isLogScale ? 'logarithmic' : 'linear'
-                        }
-                    ]
-                }
-            }
-        });
-
-    }
-
-    onMount(async (promise) => {
-        if (myChart) {
-            myChart.update()
-        } else {
-            createChart(dataSet)
-        }
-
-    });
 
 
 </script>
@@ -337,7 +156,8 @@
                 <input type=checkbox on:click={handleIsLogScale} bind:checked={$isLogScale}>
                 <span>LogScale</span>
                 <!--activity-plot-->
-                <canvas class="canvas" bind:this={chartCanvas} id="myChart"></canvas>
+                <Linechart_chartjs bind:this={Linechart}/>
+                <Linechart_carbon/>
             </div>
         </div>
         <div class="item">
