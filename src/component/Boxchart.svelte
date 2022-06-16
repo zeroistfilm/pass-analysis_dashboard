@@ -3,7 +3,7 @@
     import "carbon-components/css/carbon-components.min.css";
     import {BarChartSimple, BoxplotChart, LineChart} from "@carbon/charts-svelte";
     import {beforeUpdate, onMount} from "svelte";
-    import {activityList, isLogScale} from "../store/store";
+    import {storeDataList, isLogScale} from "../store/store";
 
     let boxplotdata = [];
     let boxChartOptions;
@@ -13,13 +13,13 @@
 
     function updateBoxPlotData() {
         let tmpdata = [];
-        for (let i = 0; i < $activityList['dayLabelList'].length; i++) {
+        for (let i = 0; i < $storeDataList['dayLabelList'].length; i++) {
 
-            for (let j = 0; j < $activityList['returnValuesArray'][i].length; j++) {
-                if ($activityList['returnValuesArray'][i][j] > 10000000) {
+            for (let j = 0; j < $storeDataList['returnActivityArray'][i].length; j++) {
+                if ($storeDataList['returnActivityArray'][i][j] > 10000000) {
                     tmpdata.push({
-                        "group": String($activityList['dayLabelList'][i]),
-                        "value": Number($activityList['returnValuesArray'][i][j])
+                        "group": String($storeDataList['dayLabelList'][i]),
+                        "value": Number($storeDataList['returnActivityArray'][i][j])
                     })
                 }
             }

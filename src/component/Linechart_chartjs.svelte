@@ -2,14 +2,14 @@
 
     import {onMount, afterUpdate} from 'svelte';
     import chartjs from 'chart.js';
-    import {activityList, isLogScale} from "../store/store";
+    import {storeDataList, isLogScale} from "../store/store";
 
 
 
     let ctx;
     let chartCanvas;
     let myChart;
-    let dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray']);
+    let dataSet = makeDataset($storeDataList['dayLabelList'], $storeDataList['returnDaysArray'], $storeDataList['returnActivityArray']);
     let isloadding = false;
 
 
@@ -50,7 +50,7 @@
 
 
     export function dataupdate() {
-        dataSet = makeDataset($activityList['dayLabelList'], $activityList['returnDaysArray'], $activityList['returnValuesArray'])
+        dataSet = makeDataset($storeDataList['dayLabelList'], $storeDataList['returnDaysArray'], $storeDataList['returnActivityArray'])
         myChart.data = dataSet
         isloadding = false;
         myChart.options = {

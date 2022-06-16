@@ -6,10 +6,11 @@ export let itemDict = writable({
     'isOtherFunction2': false,
 })
 
-export let activityList = writable({
+export let storeDataList= writable({
     'dayLabelList': [],
     'returnDaysArray': [],
-    'returnValuesArray': []
+    'returnActivityArray': [],
+    'returnQuantityArray':[]
 });
 
 

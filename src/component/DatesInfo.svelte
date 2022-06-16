@@ -2,7 +2,7 @@
     import {BarLoader} from 'svelte-loading-spinners'
     import DateSeletor from "./DateSeletor.svelte";
 
-    import {activityList, isLogScale} from "../store/store";
+    import {storeDataList, isLogScale} from "../store/store";
     import Boxchart from "./Boxchart.svelte";
     import Linechart_chartjs from "./Linechart_chartjs.svelte";
     import Linechart_carbon from "./Linechart_carbon.svelte";
@@ -41,7 +41,7 @@
         return parseInt(Math.abs(diffDate));
     }
 
-    function daysSplit(times, values) {
+    function daysSplit(times, activity, quantity) {
 
         let tmpday = new Date(Number(times[0]));
         let standardDay =new Date(tmpday.getUTCFullYear(), tmpday.getUTCMonth(), tmpday.getUTCDate(), 9)
@@ -49,23 +49,30 @@
         //let standardDay = new Date(Number(times[0]));
         let tmpDayList = [];
         let tmpValList = [];
+        let tmpQuantityList = [];
         let returnDaysArray = [];
-        let returnValuesArray = [];
+        let returnActivityArray = [];
+        let returnQuantityArray=[];
         let dayLabelList = [];
         let diff = 0;
         for (let i = 0; i <= times.length-1; i++) {
             let date = new Date(Number(times[i+1]));
 
             if (diff === getDateDiff(date, standardDay)) {
+                if (activity[i]!== null){
                 tmpDayList = [...tmpDayList, date.addDays(-getTimeDiff(date, standardDay))]
-                tmpValList = [...tmpValList, values[i]]
+                tmpValList = [...tmpValList, activity[i]]
+                tmpQuantityList = [...tmpQuantityList, quantity[i]]
+                }
 
             } else {
                 if (tmpDayList.length!==0){
                     returnDaysArray.push(tmpDayList)
-                    returnValuesArray.push(tmpValList)
+                    returnActivityArray.push(tmpValList)
+                    returnQuantityArray.push(tmpQuantityList)
                     tmpDayList = []
                     tmpValList = []
+                    tmpQuantityList = [];
                     dayLabelList.push(tmpday.getUTCFullYear().toString() + "/" +
                         (tmpday.getUTCMonth() + 1).toString() + "/" +
                         tmpday.getUTCDate().toString())
@@ -78,13 +85,13 @@
 
         }
         console.log(dayLabelList)
-        $activityList['dayLabelList'] = dayLabelList
-        $activityList['returnDaysArray'] = returnDaysArray
-        $activityList['returnValuesArray'] = returnValuesArray
+        $storeDataList['dayLabelList'] = dayLabelList
+        $storeDataList['returnDaysArray'] = returnDaysArray
+        $storeDataList['returnActivityArray'] = returnActivityArray
+        $storeDataList['returnQuantityArray'] = returnQuantityArray
 
-
-        console.log('getAct', $activityList)
-        return [dayLabelList, returnDaysArray, returnValuesArray];
+        //console.log('getAct', $Datalist)
+        return [dayLabelList, returnDaysArray, returnActivityArray];
     }
 
 
@@ -100,13 +107,13 @@
 
         const res = await fetch(`http://3.36.242.203:8000/api/activitywithdate`, {
             method: 'POST',
-            body: JSON.stringify({dates: selectedDateArray, farm: farm}),
+            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate:0.1}),
             headers: {'Content-Type': 'application/json'}
         })
 
-        const js = JSON.parse(await res.json())
-
-        daysSplit(Object.keys(js.total), Object.values(js.total))
+        const js = await res.json()
+        console.log(js)
+        daysSplit(Object.keys(js.activity), Object.values(js.activity), Object.values(js.quantity))
         Linechart.dataupdate();
 
 
@@ -156,8 +163,9 @@
                 <input type=checkbox on:click={handleIsLogScale} bind:checked={$isLogScale}>
                 <span>LogScale</span>
                 <!--activity-plot-->
-                <Linechart_chartjs bind:this={Linechart}/>
-                <Linechart_carbon/>
+                <Linechart_chartjs bind:this={Linechart} />
+                <Linechart_carbon domain={"quantity"} />
+                <Linechart_carbon domain={"activity/quantity"} />
             </div>
         </div>
         <div class="item">

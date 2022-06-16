@@ -1,9 +1,11 @@
 <script>
     import "@carbon/charts/styles.min.css";
     import "carbon-components/css/carbon-components.min.css";
-    import { LineChart} from "@carbon/charts-svelte";
+    import {LineChart} from "@carbon/charts-svelte";
     import {beforeUpdate} from "svelte";
-    import {activityList, isLogScale} from "../store/store";
+    import {storeDataList, isLogScale} from "../store/store";
+
+    export let domain;
 
 
     let dailyplot = []
@@ -13,21 +15,41 @@
     let chart;
 
 
+    function updateDailyPlotData(domain) {
 
-    function updateDailyPlotData() {
+        let datalist;
+        let title;
+
+        if (domain === "activity/quantity") {
+            datalist = $storeDataList['returnActivityArray']
+            title = "활동량/개체수"
+        } else if (domain === "quantity") {
+            datalist = $storeDataList['returnQuantityArray']
+            title = "개체수"
+        }
+
         let tmpdailyplot = [];
 
-        for (let i = 0; i < $activityList['dayLabelList'].length; i++) {
-            let label = $activityList['dayLabelList'][i]
+        for (let i = 0; i < $storeDataList['dayLabelList'].length; i++) {
+            let label = $storeDataList['dayLabelList'][i]
 
             let data = [];
 
-            for (let j = 0; j < $activityList['returnValuesArray'][i].length; j++) {
+            for (let j = 0; j < datalist[i].length; j++) {
 
-                data.push({
-                    "date": $activityList['returnDaysArray'][i][j],
-                    "value": Number($activityList['returnValuesArray'][i][j])
-                })
+                if(domain==='quantity'){
+                    data.push({
+                        "date": $storeDataList['returnDaysArray'][i][j],
+                        "value": Number(datalist[i][j])
+                    })
+
+                }else if(domain === "activity/quantity"){
+                    data.push({
+                        "date": $storeDataList['returnDaysArray'][i][j],
+                        "value": Number($storeDataList['returnActivityArray'][i][j]/$storeDataList['returnQuantityArray'][i][j])
+                    })
+                }
+
 
             }
             tmpdailyplot.push({
@@ -40,7 +62,7 @@
         dailyplot = tmpdailyplot
 
         lineChartOptions = {
-            "title": "시간별 활동량 그래프 - Linear",
+            "title": `시간별 ${title} 그래프 - Linear`,
             "axes": {
                 "bottom": {
                     "scaleType": "time",
@@ -66,26 +88,25 @@
     }
 
     beforeUpdate(() => {
-
-        updateDailyPlotData()
+        updateDailyPlotData(domain)
     })
 
 
 </script>
 
-<LineChart
-        data={
+<LineChart class="lineplot"
+           data={
         {	"labels": ["activity"],
             datasets:dailyplot
         }
 
         }
-        options={lineChartOptions}
+           options={lineChartOptions}
 />
 
 
 <style>
-    .boxplot{
-        height: 500px;
+    .lineplot {
+        height: 1100px;
     }
 </style>
