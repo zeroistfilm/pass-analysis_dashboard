@@ -60,7 +60,8 @@
                     time: {
                         displayFormats: {
                             quarter: 'MMM YYYY'
-                        }
+                        },
+
                     }
                 },
 

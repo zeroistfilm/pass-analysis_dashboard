@@ -23,7 +23,13 @@
         if (domain === "activity/quantity") {
             datalist = $storeDataList['returnActivityArray']
             title = "활동량/개체수"
-        } else if (domain === "quantity") {
+
+        }
+        else if (domain === "activity") {
+            datalist = $storeDataList['returnActivityArray']
+            title = "활동량"
+        }
+        else if (domain === "quantity") {
             datalist = $storeDataList['returnQuantityArray']
             title = "개체수"
         }
@@ -43,7 +49,13 @@
                         "value": Number(datalist[i][j])
                     })
 
-                }else if(domain === "activity/quantity"){
+                }else if(domain === "activity"){
+                    data.push({
+                        "date": $storeDataList['returnDaysArray'][i][j],
+                        "value": Number(datalist[i][j])
+                    })
+                }
+                else if(domain === "activity/quantity"){
                     data.push({
                         "date": $storeDataList['returnDaysArray'][i][j],
                         "value": Number($storeDataList['returnActivityArray'][i][j]/$storeDataList['returnQuantityArray'][i][j])
@@ -78,12 +90,13 @@
             "legend": {
                 "clickable": true
             },
-            "zoomBar": {
-                "top": {
-                    "enabled": true
-                }
-            },
-            // "height": "400px"
+            // "zoomBar": {
+            //     "top": {
+            //         "enabled": true
+            //     }
+            // },
+            "width": "1100px",
+            "height": "400px"
         }
     }
 
@@ -107,6 +120,6 @@
 
 <style>
     .lineplot {
-        height: 1100px;
+        width: 1100px;
     }
 </style>

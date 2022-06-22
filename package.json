@@ -6,7 +6,7 @@
     "dev": "routify -c my-server",
     "my-server": "rollup -c -w",
     "build": "rollup -c",
-    "start": "sirv public --no-clear --host -p 8081"
+    "start": "sirv public --no-clear -p 8081"
   },
   "devDependencies": {
     "@carbon/charts-svelte": "^0.57.0",

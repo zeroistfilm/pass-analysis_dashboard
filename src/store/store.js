@@ -14,4 +14,4 @@ export let storeDataList= writable({
 });
 
 
-export let isLogScale = writable(true)
+export let isLogScale = writable(false)
