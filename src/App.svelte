@@ -2,11 +2,8 @@
 
     import DatesInfo from "./component/DatesInfo.svelte";
     import NavBar from "./component/NavBar.svelte";
-    import Boxchart from "./component/Boxchart.svelte";
-    // import {onMount, afterUpdate, beforeUpdate} from 'svelte';
     import Menulist from "./component/Menulist.svelte";
     import {itemDict} from "./store/store.js"
-    import {LineChart} from "@carbon/charts-svelte";
     import Totalinfo from "./component/Totalinfo.svelte";
 
     let isHamburger;

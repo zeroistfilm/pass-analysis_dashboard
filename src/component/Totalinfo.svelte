@@ -1,6 +1,131 @@
 <script>
 
-import {LineChart} from "@carbon/charts-svelte";
+    import {LineChart} from "@carbon/charts-svelte";
+    import {storeDeulpulTotalDataList, storeDongilpsTotalDataList} from "../store/store";
+    import dayjs from "dayjs";
+    import Boxchart from "./Boxchart.svelte";
+    import {beforeUpdate, onMount} from "svelte";
+    import {BarLoader} from "svelte-loading-spinners";
+
+    let isloadding;
+
+    function dataLoad(farm, resData) {
+        // 날짜 -> 중첩그래프용 시간, 실제 시간, 활동량, 개체수, {"meanTemp" "maxTemp" "meanWeight" "maxWeight"}
+        //$storeDataList['dayLabelList'] = dayLabelList
+        //$storeDataList['returnDaysArray'] = returnDaysArray
+        //$storeDataList['returnActivityArray'] = returnActivityArray
+        //$storeDataList['returnQuantityArray'] = returnQuantityArray
+
+        let dayLabelList = []
+        let timeLineList = [];
+        let activityList = [];
+        let quantityList = [];
+        let meanTempList = [];
+        let maxTempList = [];
+        let meanWeightList = [];
+        let maxWeightList = [];
+
+        for (const date in resData) {
+            let tmptimeLineList = [];
+            let tmpactivityList = [];
+            let tmpquantityList = [];
+            let tmpmeanTempList = [];
+            let tmpmaxTempList = [];
+            let tmpmeanWeightList = [];
+            let tmpmaxWeightList = [];
+
+            for (let i = 0; i < resData[date].length; i++) {
+                let drawTime = new Date(Number(resData[date][i][0]));
+                let realTime = new Date(Number(resData[date][i][1]));
+                let activity = resData[date][i][2];
+                let quantity = resData[date][i][3];
+                let meanTemp = resData[date][i][4]['meanTemp'];
+                let maxTemp = resData[date][i][4]['maxTemp'];
+                let meanWeight = resData[date][i][4]['meanWeight'];
+                let maxWeight = resData[date][i][4]['maxWeight'];
+
+                tmptimeLineList.push(drawTime)
+                tmpactivityList.push(activity)
+                tmpquantityList.push(quantity)
+                tmpmeanTempList.push(meanTemp)
+                tmpmaxTempList.push(maxTemp)
+                tmpmeanWeightList.push(meanWeight)
+                tmpmaxWeightList.push(maxWeight)
+            }
+            dayLabelList.push(date)
+            timeLineList.push(tmptimeLineList)
+            activityList.push(tmpactivityList)
+            quantityList.push(tmpquantityList)
+            meanTempList.push(tmpmeanTempList)
+            maxTempList.push(tmpmaxTempList)
+            meanWeightList.push(tmpmeanWeightList)
+            maxWeightList.push(tmpmaxWeightList)
+
+        }
+
+        if (farm==="dongilps"){
+            $storeDongilpsTotalDataList['dayLabelList'] = dayLabelList
+            $storeDongilpsTotalDataList['returnDaysArray'] = timeLineList
+            $storeDongilpsTotalDataList['returnActivityArray'] = activityList
+            $storeDongilpsTotalDataList['returnQuantityArray'] = quantityList
+            $storeDongilpsTotalDataList['returnMeanTempArray'] = meanTempList
+            $storeDongilpsTotalDataList['returnMaxTempArray'] = maxTempList
+            $storeDongilpsTotalDataList['returnMeanWeightArray'] = meanWeightList
+            $storeDongilpsTotalDataList['returnMaxWeightArray'] = maxWeightList
+        }else if (farm==="deulpul"){
+            $storeDeulpulTotalDataList['dayLabelList'] = dayLabelList
+            $storeDeulpulTotalDataList['returnDaysArray'] = timeLineList
+            $storeDeulpulTotalDataList['returnActivityArray'] = activityList
+            $storeDeulpulTotalDataList['returnQuantityArray'] = quantityList
+            $storeDeulpulTotalDataList['returnMeanTempArray'] = meanTempList
+            $storeDeulpulTotalDataList['returnMaxTempArray'] = maxTempList
+            $storeDeulpulTotalDataList['returnMeanWeightArray'] = meanWeightList
+            $storeDeulpulTotalDataList['returnMaxWeightArray'] = maxWeightList
+        }
+
+
+
+
+    }
+
+    function getDateRangeList(range) {
+        var now = dayjs();
+        let dateList = []
+        for (let i = range; i >= 0; i--) {
+            dateList.push(now.add(-i,"d").format("YYYY-MM-DD"));
+        }
+        console.log(dateList)
+        return dateList;
+
+    }
+
+    async function LoadTotalInfomation(farm) {
+        //3.36.242.203:8000
+        isloadding = true;
+        let selectedDateArray = getDateRangeList(15);
+        const res = await fetch(`http://127.0.0.1:8000/api/activitywithdate`, {
+            method: 'POST',
+            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.05}),
+            headers: {'Content-Type': 'application/json'}
+        })
+
+        const resData = await res.json()
+        dataLoad(farm, resData);
+        isloadding = false;
+
+    }
+    beforeUpdate(()=>{
+
+        if ($storeDeulpulTotalDataList['dayLabelList'].length ===0){
+
+            LoadTotalInfomation('dongilps')
+            LoadTotalInfomation('deulpul')
+
+        }
+        //
+    })
+
+
 </script>
 
 
@@ -40,972 +165,52 @@ import {LineChart} from "@carbon/charts-svelte";
         <sapn class="itemRate">3%</sapn>
     </div>
 </div>
+
+{#if isloadding}
+    <div class="boards loader">
+        <BarLoader size="70" color="#FF3E00" unit="px" duration="1s"></BarLoader>
+        <span>loading...</span>
+    </div>
+{/if}
+
+<div><h3>동일 PS 15일 요약 정보</h3></div>
 <div class="boards">
-    <div class="largeBoard">
-        <LineChart
-                data={[
-	{
-		"group": "Dataset 1",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 50000,
-		"surplus": 1151643319.3614464
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": 65000,
-		"surplus": 133921672.67399856
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": null,
-		"surplus": 8956.237573331999
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 49213,
-		"surplus": 768478046.5158633
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 51213,
-		"surplus": 1188835584.0899181
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 0,
-		"surplus": 3660.158337539393
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 57312,
-		"surplus": 946425683.8324697
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 27432,
-		"surplus": 165744218.62929156
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 70323,
-		"surplus": 1154144818.5747795
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": 21300,
-		"surplus": 164476861.6609292
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 40000,
-		"surplus": 743893903.4220402
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": null,
-		"surplus": 24521.985771198284
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 18000,
-		"surplus": 17264805.405406658
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 39213,
-		"surplus": 934203.6401497436
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 61213,
-		"surplus": 1526296414.7703688
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 20000,
-		"surplus": 332276006.53242874
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 37312,
-		"surplus": 736436104.4097065
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 51432,
-		"surplus": 427875838.14166486
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 25332,
-		"surplus": 230702195.88104504
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": null,
-		"surplus": 21278.01423861022
-	}
-]}
-                options={{
-	"title": "Thresholds (line)",
-	"axes": {
-		"bottom": {
-			"title": "2019 Annual Sales Figures",
-			"mapsTo": "date",
-			"scaleType": "time",
-			"thresholds": [
-				{
-					"value": "2019-01-10T15:00:00.000Z",
-					"label": "Custom formatter"
-				}
-			]
-		},
-		"left": {
-			"mapsTo": "value",
-			"title": "Conversion rate",
-			"scaleType": "linear",
-			"thresholds": [
-				{
-					"value": 55000,
-					"label": "Custom label",
-					"fillColor": "orange"
-				},
-				{
-					"value": 10000,
-					"fillColor": "#03a9f4"
-				}
-			]
-		}
-	},
-	"curve": "curveMonotoneX",
-	"height": "400px"
-}}
-        />
+    <div class="XLargeBoard">
+        <Boxchart domain={"activity"} data={$storeDongilpsTotalDataList}/>
     </div>
-    <div class="smallBoard">
-        <LineChart
-                data={[
-	{
-		"group": "Dataset 1",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 50000,
-		"surplus": 1151643319.3614464
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": 65000,
-		"surplus": 133921672.67399856
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": null,
-		"surplus": 8956.237573331999
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 49213,
-		"surplus": 768478046.5158633
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 51213,
-		"surplus": 1188835584.0899181
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 0,
-		"surplus": 3660.158337539393
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 57312,
-		"surplus": 946425683.8324697
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 27432,
-		"surplus": 165744218.62929156
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 70323,
-		"surplus": 1154144818.5747795
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": 21300,
-		"surplus": 164476861.6609292
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 40000,
-		"surplus": 743893903.4220402
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": null,
-		"surplus": 24521.985771198284
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 18000,
-		"surplus": 17264805.405406658
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 39213,
-		"surplus": 934203.6401497436
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 61213,
-		"surplus": 1526296414.7703688
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 20000,
-		"surplus": 332276006.53242874
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 37312,
-		"surplus": 736436104.4097065
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 51432,
-		"surplus": 427875838.14166486
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 25332,
-		"surplus": 230702195.88104504
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": null,
-		"surplus": 21278.01423861022
-	}
-]}
-                options={{
-	"title": "Thresholds (line)",
-	"axes": {
-		"bottom": {
-			"title": "2019 Annual Sales Figures",
-			"mapsTo": "date",
-			"scaleType": "time",
-			"thresholds": [
-				{
-					"value": "2019-01-10T15:00:00.000Z",
-					"label": "Custom formatter"
-				}
-			]
-		},
-		"left": {
-			"mapsTo": "value",
-			"title": "Conversion rate",
-			"scaleType": "linear",
-			"thresholds": [
-				{
-					"value": 55000,
-					"label": "Custom label",
-					"fillColor": "orange"
-				},
-				{
-					"value": 10000,
-					"fillColor": "#03a9f4"
-				}
-			]
-		}
-	},
-	"curve": "curveMonotoneX",
-	"height": "400px"
-}}
-        />
-    </div>
+
 </div>
+
+
+<div><h3>들풀농장 15일 요약 정보</h3></div>
+<div class="boards">
+    <div class="XLargeBoard">
+        <Boxchart domain={"activity"} data={$storeDeulpulTotalDataList}/>
+    </div>
+
+</div>
+
 <div class="boards">
     <div class="board">
-        <LineChart
-                data={[
-	{
-		"group": "Dataset 1",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 50000,
-		"surplus": 1151643319.3614464
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": 65000,
-		"surplus": 133921672.67399856
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": null,
-		"surplus": 8956.237573331999
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 49213,
-		"surplus": 768478046.5158633
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 51213,
-		"surplus": 1188835584.0899181
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 0,
-		"surplus": 3660.158337539393
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 57312,
-		"surplus": 946425683.8324697
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 27432,
-		"surplus": 165744218.62929156
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 70323,
-		"surplus": 1154144818.5747795
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": 21300,
-		"surplus": 164476861.6609292
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 40000,
-		"surplus": 743893903.4220402
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": null,
-		"surplus": 24521.985771198284
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 18000,
-		"surplus": 17264805.405406658
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 39213,
-		"surplus": 934203.6401497436
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 61213,
-		"surplus": 1526296414.7703688
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 20000,
-		"surplus": 332276006.53242874
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 37312,
-		"surplus": 736436104.4097065
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 51432,
-		"surplus": 427875838.14166486
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 25332,
-		"surplus": 230702195.88104504
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": null,
-		"surplus": 21278.01423861022
-	}
-]}
-                options={{
-	"title": "Thresholds (line)",
-	"axes": {
-		"bottom": {
-			"title": "2019 Annual Sales Figures",
-			"mapsTo": "date",
-			"scaleType": "time",
-			"thresholds": [
-				{
-					"value": "2019-01-10T15:00:00.000Z",
-					"label": "Custom formatter"
-				}
-			]
-		},
-		"left": {
-			"mapsTo": "value",
-			"title": "Conversion rate",
-			"scaleType": "linear",
-			"thresholds": [
-				{
-					"value": 55000,
-					"label": "Custom label",
-					"fillColor": "orange"
-				},
-				{
-					"value": 10000,
-					"fillColor": "#03a9f4"
-				}
-			]
-		}
-	},
-	"curve": "curveMonotoneX",
-	"height": "400px"
-}}
-        />
+        <Boxchart domain={"meanWeight"} data={$storeDeulpulTotalDataList}/>
+
     </div>
     <div class="board">
-        <LineChart
-                data={[
-	{
-		"group": "Dataset 1",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 50000,
-		"surplus": 1151643319.3614464
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": 65000,
-		"surplus": 133921672.67399856
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": null,
-		"surplus": 8956.237573331999
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 49213,
-		"surplus": 768478046.5158633
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 51213,
-		"surplus": 1188835584.0899181
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 0,
-		"surplus": 3660.158337539393
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 57312,
-		"surplus": 946425683.8324697
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 27432,
-		"surplus": 165744218.62929156
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 70323,
-		"surplus": 1154144818.5747795
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": 21300,
-		"surplus": 164476861.6609292
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 40000,
-		"surplus": 743893903.4220402
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": null,
-		"surplus": 24521.985771198284
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 18000,
-		"surplus": 17264805.405406658
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 39213,
-		"surplus": 934203.6401497436
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 61213,
-		"surplus": 1526296414.7703688
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 20000,
-		"surplus": 332276006.53242874
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 37312,
-		"surplus": 736436104.4097065
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 51432,
-		"surplus": 427875838.14166486
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 25332,
-		"surplus": 230702195.88104504
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": null,
-		"surplus": 21278.01423861022
-	}
-]}
-                options={{
-	"title": "Thresholds (line)",
-	"axes": {
-		"bottom": {
-			"title": "2019 Annual Sales Figures",
-			"mapsTo": "date",
-			"scaleType": "time",
-			"thresholds": [
-				{
-					"value": "2019-01-10T15:00:00.000Z",
-					"label": "Custom formatter"
-				}
-			]
-		},
-		"left": {
-			"mapsTo": "value",
-			"title": "Conversion rate",
-			"scaleType": "linear",
-			"thresholds": [
-				{
-					"value": 55000,
-					"label": "Custom label",
-					"fillColor": "orange"
-				},
-				{
-					"value": 10000,
-					"fillColor": "#03a9f4"
-				}
-			]
-		}
-	},
-	"curve": "curveMonotoneX",
-	"height": "400px"
-}}
-        />
+        <Boxchart domain={"maxWeight"} data={$storeDeulpulTotalDataList}/>
     </div>
 </div>
+
+
 <div class="boards">
     <div class="board">
-        <LineChart
-                data={[
-	{
-		"group": "Dataset 1",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 50000,
-		"surplus": 1151643319.3614464
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": 65000,
-		"surplus": 133921672.67399856
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": null,
-		"surplus": 8956.237573331999
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 49213,
-		"surplus": 768478046.5158633
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 51213,
-		"surplus": 1188835584.0899181
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 0,
-		"surplus": 3660.158337539393
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 57312,
-		"surplus": 946425683.8324697
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 27432,
-		"surplus": 165744218.62929156
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 70323,
-		"surplus": 1154144818.5747795
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": 21300,
-		"surplus": 164476861.6609292
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 40000,
-		"surplus": 743893903.4220402
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": null,
-		"surplus": 24521.985771198284
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 18000,
-		"surplus": 17264805.405406658
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 39213,
-		"surplus": 934203.6401497436
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 61213,
-		"surplus": 1526296414.7703688
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 20000,
-		"surplus": 332276006.53242874
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 37312,
-		"surplus": 736436104.4097065
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 51432,
-		"surplus": 427875838.14166486
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 25332,
-		"surplus": 230702195.88104504
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": null,
-		"surplus": 21278.01423861022
-	}
-]}
-                options={{
-	"title": "Thresholds (line)",
-	"axes": {
-		"bottom": {
-			"title": "2019 Annual Sales Figures",
-			"mapsTo": "date",
-			"scaleType": "time",
-			"thresholds": [
-				{
-					"value": "2019-01-10T15:00:00.000Z",
-					"label": "Custom formatter"
-				}
-			]
-		},
-		"left": {
-			"mapsTo": "value",
-			"title": "Conversion rate",
-			"scaleType": "linear",
-			"thresholds": [
-				{
-					"value": 55000,
-					"label": "Custom label",
-					"fillColor": "orange"
-				},
-				{
-					"value": 10000,
-					"fillColor": "#03a9f4"
-				}
-			]
-		}
-	},
-	"curve": "curveMonotoneX",
-	"height": "400px"
-}}
-        />
+        <Boxchart domain={"meanTemp"} data={$storeDeulpulTotalDataList}/>
+
     </div>
     <div class="board">
-        <LineChart
-                data={[
-	{
-		"group": "Dataset 1",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 50000,
-		"surplus": 1151643319.3614464
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": 65000,
-		"surplus": 133921672.67399856
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": null,
-		"surplus": 8956.237573331999
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 49213,
-		"surplus": 768478046.5158633
-	},
-	{
-		"group": "Dataset 1",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 51213,
-		"surplus": 1188835584.0899181
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 0,
-		"surplus": 3660.158337539393
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 57312,
-		"surplus": 946425683.8324697
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 27432,
-		"surplus": 165744218.62929156
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 70323,
-		"surplus": 1154144818.5747795
-	},
-	{
-		"group": "Dataset 2",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": 21300,
-		"surplus": 164476861.6609292
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2018-12-31T15:00:00.000Z",
-		"value": 40000,
-		"surplus": 743893903.4220402
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-04T15:00:00.000Z",
-		"value": null,
-		"surplus": 24521.985771198284
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 18000,
-		"surplus": 17264805.405406658
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-12T15:00:00.000Z",
-		"value": 39213,
-		"surplus": 934203.6401497436
-	},
-	{
-		"group": "Dataset 3",
-		"date": "2019-01-16T15:00:00.000Z",
-		"value": 61213,
-		"surplus": 1526296414.7703688
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-01T15:00:00.000Z",
-		"value": 20000,
-		"surplus": 332276006.53242874
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-05T15:00:00.000Z",
-		"value": 37312,
-		"surplus": 736436104.4097065
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-07T15:00:00.000Z",
-		"value": 51432,
-		"surplus": 427875838.14166486
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-14T15:00:00.000Z",
-		"value": 25332,
-		"surplus": 230702195.88104504
-	},
-	{
-		"group": "Dataset 4",
-		"date": "2019-01-18T15:00:00.000Z",
-		"value": null,
-		"surplus": 21278.01423861022
-	}
-]}
-                options={{
-	"title": "Thresholds (line)",
-	"axes": {
-		"bottom": {
-			"title": "2019 Annual Sales Figures",
-			"mapsTo": "date",
-			"scaleType": "time",
-			"thresholds": [
-				{
-					"value": "2019-01-10T15:00:00.000Z",
-					"label": "Custom formatter"
-				}
-			]
-		},
-		"left": {
-			"mapsTo": "value",
-			"title": "Conversion rate",
-			"scaleType": "linear",
-			"thresholds": [
-				{
-					"value": 55000,
-					"label": "Custom label",
-					"fillColor": "orange"
-				},
-				{
-					"value": 10000,
-					"fillColor": "#03a9f4"
-				}
-			]
-		}
-	},
-	"curve": "curveMonotoneX",
-	"height": "400px"
-}}
-        />
+        <Boxchart domain={"maxTemp"} data={$storeDeulpulTotalDataList}/>
     </div>
 </div>
+
 
 <style>
     .boards {
@@ -1017,7 +222,18 @@ import {LineChart} from "@carbon/charts-svelte";
         gap: 25px;
         margin: 1rem;
     }
-    .largeBoard{
+    .XLargeBoard {
+        width: 1145px;
+        height: 450px;
+        left: 275px;
+        top: 272px;
+        padding: 24px 22px;
+        background: #FCFCFC;
+        border-radius: 15px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .largeBoard {
         width: 844px;
         height: 450px;
         left: 275px;
@@ -1027,6 +243,7 @@ import {LineChart} from "@carbon/charts-svelte";
         border-radius: 15px;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
+
     .board {
         width: 560px;
         height: 450px;
@@ -1037,7 +254,8 @@ import {LineChart} from "@carbon/charts-svelte";
         border-radius: 15px;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
-    .smallBoard{
+
+    .smallBoard {
         width: 277px;
         height: 450px;
         left: 1138px;
@@ -1114,7 +332,6 @@ import {LineChart} from "@carbon/charts-svelte";
         /* Frame 18 *
 
                /* Auto layout */
-
 
 
         font-family: 'Manrope';

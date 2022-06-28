@@ -2,14 +2,14 @@
 
     import {onMount, afterUpdate} from 'svelte';
     import chartjs from 'chart.js';
-    import {storeDataList, isLogScale} from "../store/store";
+    import {storeSelectedDataList, isLogScale} from "../store/store";
 
 
 
     let ctx;
     let chartCanvas;
     let myChart;
-    let dataSet = makeDataset($storeDataList['dayLabelList'], $storeDataList['returnDaysArray'], $storeDataList['returnActivityArray']);
+    let dataSet = makeDataset($storeSelectedDataList['dayLabelList'], $storeSelectedDataList['returnDaysArray'], $storeSelectedDataList['returnActivityArray']);
     let isloadding = false;
 
 
@@ -50,7 +50,7 @@
 
 
     export function dataupdate() {
-        dataSet = makeDataset($storeDataList['dayLabelList'], $storeDataList['returnDaysArray'], $storeDataList['returnActivityArray'])
+        dataSet = makeDataset($storeSelectedDataList['dayLabelList'], $storeSelectedDataList['returnDaysArray'], $storeSelectedDataList['returnActivityArray'])
         myChart.data = dataSet
         isloadding = false;
         myChart.options = {
@@ -60,7 +60,8 @@
                     time: {
                         displayFormats: {
                             quarter: 'MMM YYYY'
-                        }
+                        },
+
                     }
                 },
 

@@ -2,7 +2,7 @@
     import {BarLoader} from 'svelte-loading-spinners'
     import DateSeletor from "./DateSeletor.svelte";
 
-    import {storeDataList, isLogScale} from "../store/store";
+    import {isLogScale, storeSelectedDataList} from "../store/store";
     import Boxchart from "./Boxchart.svelte";
     import Linechart_chartjs from "./Linechart_chartjs.svelte";
     import Linechart_carbon from "./Linechart_carbon.svelte";
@@ -18,6 +18,7 @@
     let farm;
 
     let Linechart;
+
     Date.prototype.addDays = function (days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -32,6 +33,7 @@
 
         return parseInt(Math.abs(diffDate / (1000 * 3600 * 24)));
     }
+
     function getDateDiff(d1, d2) {
         const date1 = new Date(d1);
         const date2 = new Date(d2);
@@ -44,7 +46,7 @@
     function daysSplit(times, activity, quantity) {
 
         let tmpday = new Date(Number(times[0]));
-        let standardDay =new Date(tmpday.getUTCFullYear(), tmpday.getUTCMonth(), tmpday.getUTCDate(), 9)
+        let standardDay = new Date(tmpday.getUTCFullYear(), tmpday.getUTCMonth(), tmpday.getUTCDate(), 9)
         console.log(tmpday, standardDay)
         //let standardDay = new Date(Number(times[0]));
         let tmpDayList = [];
@@ -52,21 +54,21 @@
         let tmpQuantityList = [];
         let returnDaysArray = [];
         let returnActivityArray = [];
-        let returnQuantityArray=[];
+        let returnQuantityArray = [];
         let dayLabelList = [];
         let diff = 0;
-        for (let i = 0; i <= times.length-1; i++) {
-            let date = new Date(Number(times[i+1]));
+        for (let i = 0; i <= times.length - 1; i++) {
+            let date = new Date(Number(times[i + 1]));
 
             if (diff === getDateDiff(date, standardDay)) {
-                if (activity[i]!== null){
-                tmpDayList = [...tmpDayList, date.addDays(-getTimeDiff(date, standardDay))]
-                tmpValList = [...tmpValList, activity[i]]
-                tmpQuantityList = [...tmpQuantityList, quantity[i]]
+                if (activity[i] !== null) {
+                    tmpDayList = [...tmpDayList, date.addDays(-getTimeDiff(date, standardDay))]
+                    tmpValList = [...tmpValList, activity[i]]
+                    tmpQuantityList = [...tmpQuantityList, quantity[i]]
                 }
 
             } else {
-                if (tmpDayList.length!==0){
+                if (tmpDayList.length !== 0) {
                     returnDaysArray.push(tmpDayList)
                     returnActivityArray.push(tmpValList)
                     returnQuantityArray.push(tmpQuantityList)
@@ -81,19 +83,87 @@
 
             }
             diff = getDateDiff(date, standardDay)
-            tmpday =  date
+            tmpday = date
 
         }
         console.log(dayLabelList)
-        $storeDataList['dayLabelList'] = dayLabelList
-        $storeDataList['returnDaysArray'] = returnDaysArray
-        $storeDataList['returnActivityArray'] = returnActivityArray
-        $storeDataList['returnQuantityArray'] = returnQuantityArray
+        $storeSelectedDataList['dayLabelList'] = dayLabelList
+        $storeSelectedDataList['returnDaysArray'] = returnDaysArray
+        $storeSelectedDataList['returnActivityArray'] = returnActivityArray
+        $storeSelectedDataList['returnQuantityArray'] = returnQuantityArray
 
-        //console.log('getAct', $Datalist)
-        return [dayLabelList, returnDaysArray, returnActivityArray];
+
+
+
+
     }
 
+
+    function dataLoad(resData) {
+        // 날짜 -> 중첩그래프용 시간, 실제 시간, 활동량, 개체수, {"meanTemp" "maxTemp" "meanWeight" "maxWeight"}
+        //$storeSelectedDataList['dayLabelList'] = dayLabelList
+        //$storeSelectedDataList['returnDaysArray'] = returnDaysArray
+        //$storeSelectedDataList['returnActivityArray'] = returnActivityArray
+        //$storeSelectedDataList['returnQuantityArray'] = returnQuantityArray
+
+        let dayLabelList = []
+        let timeLineList = [];
+        let activityList = [];
+        let quantityList = [];
+        let meanTempList = [];
+        let maxTempList = [];
+        let meanWeightList = [];
+        let maxWeightList = [];
+
+        for (const date in resData) {
+            let tmptimeLineList = [];
+            let tmpactivityList = [];
+            let tmpquantityList = [];
+            let tmpmeanTempList = [];
+            let tmpmaxTempList = [];
+            let tmpmeanWeightList = [];
+            let tmpmaxWeightList = [];
+
+            for (let i = 0; i < resData[date].length; i++) {
+                let drawTime = new Date(Number(resData[date][i][0]));
+                let realTime = new Date(Number(resData[date][i][1]));
+                let activity = resData[date][i][2];
+                let quantity = resData[date][i][3];
+                let meanTemp = resData[date][i][4]['meanTemp'];
+                let maxTemp = resData[date][i][4]['maxTemp'];
+                let meanWeight = resData[date][i][4]['meanWeight'];
+                let maxWeight = resData[date][i][4]['maxWeight'];
+
+                tmptimeLineList.push(drawTime)
+                tmpactivityList.push(activity)
+                tmpquantityList.push(quantity)
+                tmpmeanTempList.push(meanTemp)
+                tmpmaxTempList.push(maxTemp)
+                tmpmeanWeightList.push(meanWeight)
+                tmpmaxWeightList.push(maxWeight)
+            }
+            dayLabelList.push(date)
+            timeLineList.push(tmptimeLineList)
+            activityList.push(tmpactivityList)
+            quantityList.push(tmpquantityList)
+            meanTempList.push(tmpmeanTempList)
+            maxTempList.push(tmpmaxTempList)
+            meanWeightList.push(tmpmeanWeightList)
+            maxWeightList.push(tmpmaxWeightList)
+
+        }
+        $storeSelectedDataList['dayLabelList'] = dayLabelList
+        $storeSelectedDataList['returnDaysArray'] = timeLineList
+        $storeSelectedDataList['returnActivityArray'] = activityList
+        $storeSelectedDataList['returnQuantityArray'] = quantityList
+        $storeSelectedDataList['returnMeanTempArray'] = meanTempList
+        $storeSelectedDataList['returnMaxTempArray'] = maxTempList
+        $storeSelectedDataList['returnMeanWeightArray'] = meanWeightList
+        $storeSelectedDataList['returnMaxWeightArray'] = maxWeightList
+
+
+
+    }
 
     async function getActivtyWithManyDates() {
         console.log(selectedDateArray)
@@ -105,19 +175,21 @@
         }
         isloadding = true;
 
-        const res = await fetch(`http://3.36.242.203:8000/api/activitywithdate`, {
+        //3.36.242.203:8000
+        const res = await fetch(`http://127.0.0.1:8000/api/activitywithdate`, {
             method: 'POST',
-            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate:0.1}),
+            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.05}),
             headers: {'Content-Type': 'application/json'}
         })
 
-        const js = await res.json()
-        console.log(js)
-        daysSplit(Object.keys(js.activity), Object.values(js.activity), Object.values(js.quantity))
+        const resData = await res.json()
+
+        //daysSplit(Object.keys(resData.activity), Object.values(resData.activity), Object.values(resData.quantity))
+        isloadding = false;
+        dataLoad(resData);
+
         Linechart.dataupdate();
 
-
-        isloadding = false;
 
     }
 
@@ -126,8 +198,6 @@
         isLogScale.set(!$isLogScale)
         Linechart.dataupdate();
     }
-
-
 
 
 </script>
@@ -154,18 +224,28 @@
 
             <div class="itemInner">
                 <!--boxp-lot-->
-                <Boxchart/>
+
+                <Boxchart domain={"activity"} data={$storeSelectedDataList}/>
             </div>
         </div>
+        <div class="item">
+            <Boxchart domain={"meanWeight"} data={$storeSelectedDataList}/>
+            <Boxchart domain={"maxWeight"} data={$storeSelectedDataList}/>
+        </div>
+        <div class="item">
 
+            <Boxchart domain={"meanTemp"} data={$storeSelectedDataList}/>
+            <Boxchart domain={"maxTemp"} data={$storeSelectedDataList}/>
+        </div>
         <div class="item">
             <div class="itemInnerNoWidth">
                 <input type=checkbox on:click={handleIsLogScale} bind:checked={$isLogScale}>
                 <span>LogScale</span>
                 <!--activity-plot-->
-                <Linechart_chartjs bind:this={Linechart} />
-                <Linechart_carbon domain={"quantity"} />
-                <Linechart_carbon domain={"activity/quantity"} />
+                <Linechart_chartjs bind:this={Linechart}/>
+<!--                <Linechart_carbon domain={"activity"}/>-->
+                <Linechart_carbon domain={"quantity"}/>
+                <Linechart_carbon domain={"activity/quantity"}/>
             </div>
         </div>
         <div class="item">
@@ -176,9 +256,10 @@
 
 
 <style>
-    .canvas{
+    .canvas {
         width: 1100px;
     }
+
     .frame {
         /* Frame-col */
 
@@ -259,8 +340,6 @@
         flex-direction: column;
         align-items: flex-start;
         padding: 15px;
-
-
 
 
         /* Inside auto layout */
