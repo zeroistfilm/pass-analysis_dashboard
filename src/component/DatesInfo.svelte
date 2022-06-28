@@ -2,7 +2,7 @@
     import {BarLoader} from 'svelte-loading-spinners'
     import DateSeletor from "./DateSeletor.svelte";
 
-    import {storeDataList, isLogScale} from "../store/store";
+    import {isLogScale, storeSelectedDataList} from "../store/store";
     import Boxchart from "./Boxchart.svelte";
     import Linechart_chartjs from "./Linechart_chartjs.svelte";
     import Linechart_carbon from "./Linechart_carbon.svelte";
@@ -18,6 +18,7 @@
     let farm;
 
     let Linechart;
+
     Date.prototype.addDays = function (days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -86,14 +87,12 @@
 
         }
         console.log(dayLabelList)
-        $storeDataList['dayLabelList'] = dayLabelList
-        $storeDataList['returnDaysArray'] = returnDaysArray
-        $storeDataList['returnActivityArray'] = returnActivityArray
-        $storeDataList['returnQuantityArray'] = returnQuantityArray
+        $storeSelectedDataList['dayLabelList'] = dayLabelList
+        $storeSelectedDataList['returnDaysArray'] = returnDaysArray
+        $storeSelectedDataList['returnActivityArray'] = returnActivityArray
+        $storeSelectedDataList['returnQuantityArray'] = returnQuantityArray
 
-        console.log('returnDaysArray', $storeDataList['returnDaysArray'])
-        console.log('returnActivityArray', $storeDataList['returnActivityArray'])
-        console.log('returnQuantityArray', $storeDataList['returnQuantityArray'])
+
 
 
 
@@ -102,10 +101,10 @@
 
     function dataLoad(resData) {
         // 날짜 -> 중첩그래프용 시간, 실제 시간, 활동량, 개체수, {"meanTemp" "maxTemp" "meanWeight" "maxWeight"}
-        //$storeDataList['dayLabelList'] = dayLabelList
-        //$storeDataList['returnDaysArray'] = returnDaysArray
-        //$storeDataList['returnActivityArray'] = returnActivityArray
-        //$storeDataList['returnQuantityArray'] = returnQuantityArray
+        //$storeSelectedDataList['dayLabelList'] = dayLabelList
+        //$storeSelectedDataList['returnDaysArray'] = returnDaysArray
+        //$storeSelectedDataList['returnActivityArray'] = returnActivityArray
+        //$storeSelectedDataList['returnQuantityArray'] = returnQuantityArray
 
         let dayLabelList = []
         let timeLineList = [];
@@ -153,10 +152,14 @@
             maxWeightList.push(tmpmaxWeightList)
 
         }
-        $storeDataList['dayLabelList'] = dayLabelList
-        $storeDataList['returnDaysArray'] = timeLineList
-        $storeDataList['returnActivityArray'] = activityList
-        $storeDataList['returnQuantityArray'] = quantityList
+        $storeSelectedDataList['dayLabelList'] = dayLabelList
+        $storeSelectedDataList['returnDaysArray'] = timeLineList
+        $storeSelectedDataList['returnActivityArray'] = activityList
+        $storeSelectedDataList['returnQuantityArray'] = quantityList
+        $storeSelectedDataList['returnMeanTempArray'] = meanTempList
+        $storeSelectedDataList['returnMaxTempArray'] = maxTempList
+        $storeSelectedDataList['returnMeanWeightArray'] = meanWeightList
+        $storeSelectedDataList['returnMaxWeightArray'] = maxWeightList
 
 
 
@@ -175,7 +178,7 @@
         //3.36.242.203:8000
         const res = await fetch(`http://127.0.0.1:8000/api/activitywithdate`, {
             method: 'POST',
-            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.25}),
+            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.05}),
             headers: {'Content-Type': 'application/json'}
         })
 
@@ -221,10 +224,19 @@
 
             <div class="itemInner">
                 <!--boxp-lot-->
-                <Boxchart/>
+
+                <Boxchart domain={"activity"} data={$storeSelectedDataList}/>
             </div>
         </div>
+        <div class="item">
+            <Boxchart domain={"meanWeight"} data={$storeSelectedDataList}/>
+            <Boxchart domain={"maxWeight"} data={$storeSelectedDataList}/>
+        </div>
+        <div class="item">
 
+            <Boxchart domain={"meanTemp"} data={$storeSelectedDataList}/>
+            <Boxchart domain={"maxTemp"} data={$storeSelectedDataList}/>
+        </div>
         <div class="item">
             <div class="itemInnerNoWidth">
                 <input type=checkbox on:click={handleIsLogScale} bind:checked={$isLogScale}>

@@ -3,7 +3,7 @@
     import "carbon-components/css/carbon-components.min.css";
     import {LineChart} from "@carbon/charts-svelte";
     import {beforeUpdate} from "svelte";
-    import {storeDataList, isLogScale} from "../store/store";
+    import {storeSelectedDataList, isLogScale} from "../store/store";
 
     export let domain;
 
@@ -21,23 +21,23 @@
         let title;
 
         if (domain === "activity/quantity") {
-            datalist = $storeDataList['returnActivityArray']
+            datalist = $storeSelectedDataList['returnActivityArray']
             title = "활동량/개체수"
 
         }
         else if (domain === "activity") {
-            datalist = $storeDataList['returnActivityArray']
+            datalist = $storeSelectedDataList['returnActivityArray']
             title = "활동량"
         }
         else if (domain === "quantity") {
-            datalist = $storeDataList['returnQuantityArray']
+            datalist = $storeSelectedDataList['returnQuantityArray']
             title = "개체수"
         }
 
         let tmpdailyplot = [];
 
-        for (let i = 0; i < $storeDataList['dayLabelList'].length; i++) {
-            let label = $storeDataList['dayLabelList'][i]
+        for (let i = 0; i < $storeSelectedDataList['dayLabelList'].length; i++) {
+            let label = $storeSelectedDataList['dayLabelList'][i]
 
             let data = [];
 
@@ -45,20 +45,20 @@
 
                 if(domain==='quantity'){
                     data.push({
-                        "date": $storeDataList['returnDaysArray'][i][j],
+                        "date": $storeSelectedDataList['returnDaysArray'][i][j],
                         "value": Number(datalist[i][j])
                     })
 
                 }else if(domain === "activity"){
                     data.push({
-                        "date": $storeDataList['returnDaysArray'][i][j],
+                        "date": $storeSelectedDataList['returnDaysArray'][i][j],
                         "value": Number(datalist[i][j])
                     })
                 }
                 else if(domain === "activity/quantity"){
                     data.push({
-                        "date": $storeDataList['returnDaysArray'][i][j],
-                        "value": Number($storeDataList['returnActivityArray'][i][j]/$storeDataList['returnQuantityArray'][i][j])
+                        "date": $storeSelectedDataList['returnDaysArray'][i][j],
+                        "value": Number($storeSelectedDataList['returnActivityArray'][i][j]/$storeSelectedDataList['returnQuantityArray'][i][j])
                     })
                 }
 
