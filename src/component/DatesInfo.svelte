@@ -176,7 +176,7 @@
         isloadding = true;
 
         //3.36.242.203:8000
-        const res = await fetch(`http://127.0.0.1:8000/api/activitywithdate`, {
+        const res = await fetch(`http://3.36.242.203:8000/api/activitywithdate`, {
             method: 'POST',
             body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.05}),
             headers: {'Content-Type': 'application/json'}
