@@ -1,7 +1,7 @@
 <script>
     import "@carbon/charts/styles.min.css";
     import "carbon-components/css/carbon-components.min.css";
-    import {BoxplotChart} from "@carbon/charts-svelte";
+    import { BoxplotChart}  from "@carbon/charts-svelte";
     import {beforeUpdate} from "svelte";
     import {isLogScale} from "../store/store";
 
@@ -23,13 +23,13 @@
             datalist = data['returnMeanWeightArray']
             title = "평균무게"
         } else if (domain === "maxWeight") {
-            datalist = data['returnMaxWeightArray']
+            datalist =data['returnMaxWeightArray']
             title = "최고무게"
         } else if (domain === "meanTemp") {
             datalist = data['returnMeanTempArray']
             title = "평균온도"
         } else if (domain === "maxTemp") {
-            datalist = data['returnMaxTempArray']
+            datalist =data['returnMaxTempArray']
             title = "최고온도"
         } else if (domain === "activity") {
             datalist = data['returnActivityArray']
@@ -37,18 +37,18 @@
         }
 
         let tmpdata = [];
-        for (let i = 0; i < data['dayLabelList'].length; i++) {
+        for (let i = 0; i <data['dayLabelList'].length; i++) {
             for (let j = 0; j < datalist[i].length; j++) {
                 if (domain === "activity") {
 
-                    // if (datalist[i][j] > 10000000) {
-                    tmpdata.push({
-                        // "date": $storeDataList['returnDaysArray'][i][j],
-                        // "value": Number(datalist[i][j])
-                        "group": String(data['dayLabelList'][i]),
-                        "value": Number(datalist[i][j])
-                    })
-                    // }
+                    if (datalist[i][j] > 10) {
+                        tmpdata.push({
+                            // "date": $storeDataList['returnDaysArray'][i][j],
+                            // "value": Number(datalist[i][j])
+                            "group": String(data['dayLabelList'][i]),
+                            "value": Number(datalist[i][j])
+                        })
+                    }
                 } else {
                     tmpdata.push({
                         "group": String(data['dayLabelList'][i]),
@@ -58,6 +58,7 @@
                 }
             }
         }
+
 
 
         boxplotdata = tmpdata
@@ -86,7 +87,7 @@
 
 
     beforeUpdate(() => {
-        if (data !== undefined) {
+        if (data !== undefined){
             updateBoxPlotData(domain, data)
         }
 
