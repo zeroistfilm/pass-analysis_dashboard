@@ -178,7 +178,7 @@
         //3.36.242.203:8000
         const res = await fetch(`http://3.36.242.203:8000/api/activitywithdate`, {
             method: 'POST',
-            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.05}),
+            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.4}),
             headers: {'Content-Type': 'application/json'}
         })
 
