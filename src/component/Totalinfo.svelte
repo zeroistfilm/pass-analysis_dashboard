@@ -103,7 +103,7 @@
         //3.36.242.203:8000
         isloadding = true;
         let selectedDateArray = getDateRangeList(15);
-        const res = await fetch(`http://3.36.242.203:8000/api/activitywithdate`, {
+        const res = await fetch(`https://api.uniai.co.kr/api/activitywithdate`, {
             method: 'POST',
             body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.6}),
             headers: {'Content-Type': 'application/json'}
