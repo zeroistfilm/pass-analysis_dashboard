@@ -1,8 +1,8 @@
 import {derived, writable} from "svelte/store";
 
 export let itemDict = writable({
-    'TotalInfo': true,
-    'DatesInfo': false,
+    'TotalInfo': false,
+    'DatesInfo': true,
     'isOtherFunction2': false,
 })
 export let storeDongilpsTotalDataList= writable({
