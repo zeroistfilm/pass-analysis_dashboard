@@ -176,7 +176,7 @@
         //3.36.242.203:8000
         const res = await fetch(`https://api.uniai.co.kr/api/activitywithdate`, {
             method: 'POST',
-            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.4}),
+            body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.2}),
             headers: {'Content-Type': 'application/json'}
         })
 
