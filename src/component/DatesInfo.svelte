@@ -93,9 +93,6 @@
         $storeSelectedDataList['returnQuantityArray'] = returnQuantityArray
 
 
-
-
-
     }
 
 
@@ -177,7 +174,10 @@
         const res = await fetch(`https://api.uniai.co.kr/api/activitywithdate`, {
             method: 'POST',
             body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.2}),
-            headers: {'Content-Type': 'application/json'}
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ycZvQsIGpbYEbtlyqgBEFu0UmpwvNvuh4alsnk4lEki81Pdb76r9SEl0nofUMu0HXbiOxrD6Xvovf46cqtyoauelInZBAkcTObisJcrEGLhTqpWz18QJXZxjtc4R5Zkd'
+            }
         })
 
         const resData = await res.json()
@@ -241,7 +241,7 @@
                 <span>LogScale</span>
                 <!--activity-plot-->
                 <Linechart_chartjs bind:this={Linechart}/>
-<!--                <Linechart_carbon domain={"activity"}/>-->
+                <!--                <Linechart_carbon domain={"activity"}/>-->
                 <Linechart_carbon domain={"quantity"}/>
                 <Linechart_carbon domain={"activity/quantity"}/>
             </div>

@@ -63,7 +63,7 @@
 
         }
 
-        if (farm==="dongilps"){
+        if (farm === "dongilps") {
             $storeDongilpsTotalDataList['dayLabelList'] = dayLabelList
             $storeDongilpsTotalDataList['returnDaysArray'] = timeLineList
             $storeDongilpsTotalDataList['returnActivityArray'] = activityList
@@ -72,7 +72,7 @@
             $storeDongilpsTotalDataList['returnMaxTempArray'] = maxTempList
             $storeDongilpsTotalDataList['returnMeanWeightArray'] = meanWeightList
             $storeDongilpsTotalDataList['returnMaxWeightArray'] = maxWeightList
-        }else if (farm==="deulpul"){
+        } else if (farm === "deulpul") {
             $storeDeulpulTotalDataList['dayLabelList'] = dayLabelList
             $storeDeulpulTotalDataList['returnDaysArray'] = timeLineList
             $storeDeulpulTotalDataList['returnActivityArray'] = activityList
@@ -84,15 +84,13 @@
         }
 
 
-
-
     }
 
     function getDateRangeList(range) {
         var now = dayjs();
         let dateList = []
         for (let i = range; i >= 0; i--) {
-            dateList.push(now.add(-i,"d").format("YYYY-MM-DD"));
+            dateList.push(now.add(-i, "d").format("YYYY-MM-DD"));
         }
         console.log(dateList)
         return dateList;
@@ -106,7 +104,10 @@
         const res = await fetch(`https://api.uniai.co.kr/api/activitywithdate`, {
             method: 'POST',
             body: JSON.stringify({dates: selectedDateArray, farm: farm, sampleRate: 0.3}),
-            headers: {'Content-Type': 'application/json'}
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ycZvQsIGpbYEbtlyqgBEFu0UmpwvNvuh4alsnk4lEki81Pdb76r9SEl0nofUMu0HXbiOxrD6Xvovf46cqtyoauelInZBAkcTObisJcrEGLhTqpWz18QJXZxjtc4R5Zkd'
+            }
         })
 
         const resData = await res.json()
@@ -114,9 +115,10 @@
         isloadding = false;
 
     }
-    beforeUpdate(()=>{
 
-        if ($storeDeulpulTotalDataList['dayLabelList'].length ===0){
+    beforeUpdate(() => {
+
+        if ($storeDeulpulTotalDataList['dayLabelList'].length === 0) {
 
             LoadTotalInfomation('dongilps')
             LoadTotalInfomation('deulpul')
@@ -222,6 +224,7 @@
         gap: 25px;
         margin: 1rem;
     }
+
     .XLargeBoard {
         width: 1145px;
         height: 450px;
